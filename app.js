@@ -1,10 +1,16 @@
 let isAdmin = false;
 let currentYear = new Date().getFullYear().toString(); 
 let currentCategory = ''; 
+let availableYears = []; // ডেটাবেস থেকে সালগুলো এখানে এসে জমা হবে
 
+// =========================================
+// ১. ইনিশিয়ালাইজেশন এবং লগইন চেক
+// =========================================
 window.onload = () => {
-    setupYearSelector();
+    // প্রথমেই ডেটাবেস থেকে সেভ করা সালগুলো লোড হবে
     setTimeout(() => {
+        loadYearsFromDatabase();
+        
         if (window.onAuthStateChanged) {
             window.onAuthStateChanged(window.auth, (user) => {
                 if (user) {
@@ -27,6 +33,69 @@ window.onload = () => {
     }, 1000);
 };
 
+// =========================================
+// ২. বছর বা সাল কন্ট্রোল (Year Management)
+// =========================================
+function loadYearsFromDatabase() {
+    const yearsRef = window.dbRef(window.database, 'system/years');
+    window.dbOnValue(yearsRef, (snapshot) => {
+        if (snapshot.exists()) {
+            availableYears = snapshot.val();
+        } else {
+            // যদি ডেটাবেসে কোনো সাল না থাকে, তাহলে বর্তমান বছরটা যোগ করে দেবে
+            availableYears = [currentYear];
+            window.dbSet(yearsRef, availableYears);
+        }
+        renderYearSelector();
+    });
+}
+
+function renderYearSelector() {
+    const yearSelect = document.getElementById('year-select');
+    yearSelect.innerHTML = '';
+    // সালগুলো সাজিয়ে ড্রপডাউনে দেখানো
+    availableYears.sort((a, b) => b - a).forEach(year => {
+        let opt = document.createElement('option');
+        opt.value = year;
+        opt.innerText = year;
+        if (year === currentYear) opt.selected = true;
+        yearSelect.appendChild(opt);
+    });
+}
+
+// অ্যাডমিন নতুন বছর যোগ করার অপশন
+function openAddYearPrompt() {
+    const newYear = prompt("নতুন পুজো বছর লিখুন (যেমন: 2027):");
+    if (newYear && newYear.trim().length === 4 && !isNaN(newYear)) {
+        if (!availableYears.includes(newYear)) {
+            availableYears.push(newYear);
+            // ডেটাবেসে নতুন সাল সেভ করা
+            window.dbSet(window.dbRef(window.database, 'system/years'), availableYears).then(() => {
+                currentYear = newYear; // কারেন্ট ইয়ার আপডেট করা
+                renderYearSelector();
+                loadAllData(); // নতুন বছরের ফাঁকা ডেটা লোড করা
+                alert(newYear + " সাল সফলভাবে যোগ করা হয়েছে!");
+            });
+        } else {
+            alert("এই সালটি আগে থেকেই ড্রপডাউনে আছে!");
+            currentYear = newYear;
+            renderYearSelector();
+            loadAllData();
+        }
+    } else if (newYear !== null) {
+        alert("দয়া করে সঠিক ৪ সংখ্যার সাল লিখুন!");
+    }
+}
+
+// ড্রপডাউন থেকে সাল পরিবর্তন করলে ডেটা আপডেট হবে
+function handleYearChange() {
+    currentYear = document.getElementById('year-select').value;
+    loadAllData(); // যে বছর সিলেক্ট করবে, সেই বছরের ডেটা লোড হবে
+}
+
+// =========================================
+// ৩. অ্যাডমিন লগইন / লগআউট কন্ট্রোল
+// =========================================
 function toggleAdminModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
 
 function submitAdminLogin() {
@@ -49,22 +118,16 @@ function logoutAdmin() {
     }
 }
 
-function setupYearSelector() {
-    document.getElementById('year-select').innerHTML = `<option value="${currentYear}">${currentYear}</option>`;
-}
-
-function handleYearChange() {
-    currentYear = document.getElementById('year-select').value;
-    loadAllData();
-}
-
+// =========================================
+// ৪. ডেটা লোড করা (Notices, Funds, Expenses)
+// =========================================
 function loadAllData() {
     loadNotices();
     loadFinancialData();
     loadExpenses();
+    if (currentCategory) loadCategoryData(); // যদি কোনো মডাল খোলা থাকে সেটাও আপডেট হবে
 }
 
-// নোটিশ লোড ও এডিট/ডিলিট
 function loadNotices() {
     const noticesRef = window.dbRef(window.database, 'notices');
     window.dbOnValue(noticesRef, (snapshot) => {
@@ -74,7 +137,7 @@ function loadNotices() {
             const data = snapshot.val();
             Object.keys(data).reverse().forEach(key => {
                 const notice = data[key];
-                const safeText = notice.text.replace(/"/g, '&quot;'); // কোটেশন মার্ক এড়ানোর জন্য
+                const safeText = notice.text.replace(/"/g, '&quot;');
                 const actionHtml = isAdmin ? `
                     <div style="margin-top:5px;">
                         <button class="edit-entry-btn" data-text="${safeText}" onclick="editNotice('${key}', this.getAttribute('data-text'))">এডিট</button>
@@ -95,8 +158,8 @@ function loadNotices() {
     });
 }
 
-// মূল তহবিল
 function loadFinancialData() {
+    // এখানে currentYear ব্যবহার করা হয়েছে, তাই সাল পাল্টালেই ডেটা পাল্টে যাবে
     const yearRef = window.dbRef(window.database, `funds/${currentYear}`);
     window.dbOnValue(yearRef, (snapshot) => {
         let totalIncome = 0; let totalExpense = 0;
@@ -113,7 +176,6 @@ function loadFinancialData() {
     });
 }
 
-// খরচের তালিকা ও এডিট/ডিলিট
 function loadExpenses() {
     const expensesRef = window.dbRef(window.database, `funds/${currentYear}/expenses`);
     window.dbOnValue(expensesRef, (snapshot) => {
@@ -145,7 +207,9 @@ function loadExpenses() {
     });
 }
 
-// মডাল ও ক্যাটাগরি ডেটা
+// =========================================
+// ৫. মডাল ও ক্যাটাগরি ডেটা
+// =========================================
 function openCategoryModal(categoryId, title) {
     currentCategory = categoryId;
     document.getElementById('modal-title').innerText = title;
@@ -190,7 +254,9 @@ function loadCategoryData() {
     });
 }
 
-// ডেটা সেভ
+// =========================================
+// ৬. ডেটা সেভ করা (Add)
+// =========================================
 function addNewNotice() {
     const text = document.getElementById('new-notice-text').value;
     if (!text) { alert("নোটিশ ফাঁকা রাখা যাবে না!"); return; }
@@ -217,7 +283,9 @@ function addCategoryDataEntry() {
         .then(() => { document.getElementById('data-name').value = ''; document.getElementById('data-amount').value = ''; });
 }
 
-// এডিট লজিক
+// =========================================
+// ৭. ডেটা এডিট করা (Edit)
+// =========================================
 function editNotice(key, currentText) {
     const newText = prompt("নোটিশ আপডেট করুন:", currentText);
     if (newText !== null && newText.trim() !== "" && newText !== currentText) {
@@ -245,37 +313,33 @@ function editCategory(key, currentName, currentAmount) {
     }
 }
 
-// ডিলিট
+// =========================================
+// ৮. ডেটা ডিলিট করা
+// =========================================
 function deleteData(path) {
     if(confirm("আপনি কি নিশ্চিত যে এই এন্ট্রিটি ডিলিট করতে চান?")) {
         window.dbRemove(window.dbRef(window.database, path));
     }
 }
 
-// ভিউ কাউন্টার লজিক
+// =========================================
+// ৯. ভিউ কাউন্টার লজিক (সবার জন্য)
+// =========================================
 function setupViewCounter() {
     const viewsRef = window.dbRef(window.database, 'system/viewCount');
     window.dbOnValue(viewsRef, (snapshot) => {
         let count = snapshot.exists() ? snapshot.val() : 0;
-        document.getElementById('app-view-count').innerText = count;
+        const counterElement = document.getElementById('app-view-count');
+        if (counterElement) {
+            counterElement.innerText = count.toLocaleString('bn-IN');
+        }
     });
 
     if (!sessionStorage.getItem('hasCountedView')) {
-        let incremented = false;
-        const unsub = window.dbOnValue(viewsRef, (snapshot) => {
-            if (!incremented) {
-                incremented = true;
-                let currentCount = snapshot.exists() ? snapshot.val() : 0;
-                window.dbSet(viewsRef, currentCount + 1);
-                sessionStorage.setItem('hasCountedView', 'true');
-                unsub(); 
-            }
-        });
+        window.dbOnValue(viewsRef, (snapshot) => {
+            let currentCount = snapshot.exists() ? snapshot.val() : 0;
+            window.dbSet(viewsRef, currentCount + 1);
+            sessionStorage.setItem('hasCountedView', 'true');
+        }, { onlyOnce: true });
     }
-}
-
-function toggleClubEditModal(show) {
-    const modal = document.getElementById('club-edit-modal');
-    if (show) modal.classList.remove('hidden');
-    else modal.classList.add('hidden');
 }

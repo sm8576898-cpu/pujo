@@ -10,14 +10,16 @@
 </head>
 <body>
 
+    <!-- View Counter Header Section -->
+    <div style="text-align: center; background: #1a1a2e; padding: 10px; color: #2ed573; font-weight: bold; border-bottom: 2px solid #282846;">
+        👁️ মোট অ্যাপ ভিজিটর: <span id="app-view-count">০</span>
+    </div>
+
     <!-- Header Section -->
     <header class="main-header">
         <div class="club-info-container">
             <h1 id="display-club-name">🪔 আমাদের গ্রাম্য পুজো কমিটি</h1>
             <p id="display-club-address">📍 গ্রাম + পোস্ট: বাগনান, উলুবেড়িয়া, হাওড়া</p>
-            <div id="display-club-contacts" class="contacts-grid">
-                <!-- Contacts will be generated dynamically -->
-            </div>
         </div>
         <div class="auth-box">
             <button id="admin-login-btn" onclick="toggleAdminModal()">🔒 অ্যাডমিন লগইন</button>
@@ -28,13 +30,14 @@
     <!-- Year & Main Fund Section -->
     <main class="main-container">
         <section class="control-panel">
-            <div class="year-selector-box">
+            <div class="year-selector-box" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <label for="year-select">📅 বছর বাছুন: </label>
-                <select id="year-select" onchange="handleYearChange()"></select>
-                <button id="add-year-btn" class="admin-only hidden" onclick="openAddYearPrompt()">➕ নতুন বছর যোগ করুন</button>
+                <select id="year-select" onchange="handleYearChange()" style="padding: 5px; border-radius: 5px;"></select>
+                <!-- অ্যাডমিন বাটন: নতুন বছর যোগ করার জন্য -->
+                <button id="add-year-btn" class="admin-only hidden" onclick="openAddYearPrompt()" style="background: #2ed573; color: #12121c; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold;">➕ নতুন বছর যোগ করুন</button>
             </div>
 
-            <!-- মূল তহবিল (Main Fund) -->
+            <!-- মূল তহবিল -->
             <div class="bokbhandar-card">
                 <h3>🪙 পুজো মূল তহবিল</h3>
                 <div class="fund-grid">
@@ -163,7 +166,7 @@
         <div class="auth-modal-content">
             <h3>🔒 অ্যাডমিন প্যানেল লগইন</h3>
             <p>সিস্টেমে নতুন এন্ট্রি বা এডিট করার জন্য ইমেইল ও পাসওয়ার্ড দিন</p>
-            <input type="email" id="admin-email" placeholder="অ্যাডমিন ইমেইল লিখুন" style="letter-spacing: normal; margin-bottom: 10px;">
+            <input type="email" id="admin-email" placeholder="অ্যাডমিন ইমেইল লিখুন">
             <input type="password" id="admin-password" placeholder="সিক্রেট পাসওয়ার্ড (PIN) লিখুন">
             
             <div class="auth-buttons">
@@ -173,32 +176,14 @@
         </div>
     </div>
 
-    <!-- Edit Club Info Modal -->
-    <div id="club-edit-modal" class="modal-overlay hidden">
-        <div class="auth-modal-content">
-            <h3>📝 ক্লাবের সাধারণ তথ্য পরিবর্তন</h3>
-            <input type="text" id="edit-club-name" placeholder="ক্লাবের নাম">
-            <input type="text" id="edit-club-address" placeholder="ঠিকানা">
-            <input type="text" id="edit-club-contacts" placeholder="মোবাইল নম্বর (কমা দিয়ে একাধিক লিখতে পারেন)">
-            <div class="auth-buttons">
-                <button class="login-submit-btn" onclick="saveClubSettings()">সেভ করুন</button>
-                <button class="login-cancel-btn" onclick="toggleClubEditModal(false)">বাতিল</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Floating Admin Edit trigger -->
-    <button id="quick-edit-club-btn" class="admin-only hidden floating-edit-btn" onclick="toggleClubEditModal(true)">⚙️ ক্লাব প্রোফাইল এডিট</button>
-
     <!-- ফায়ারবেস (Firebase) কানেকশন স্ক্রিপ্ট -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-        // তোমার আসল ফায়ারবেস প্রোজেক্টের কোড 
         const firebaseConfig = {
-            apiKey: "AIzaSyD6QGPDanVqLK3gQSGD5SrklGfbpTki3K8",
+            apiKey: "AIzaSyD6QGPDanVqLk3gQSGD5SrklGfbpTki3K8",
             authDomain: "pujo-cdfa5.firebaseapp.com",
             projectId: "pujo-cdfa5",
             storageBucket: "pujo-cdfa5.firebasestorage.app",
@@ -207,8 +192,6 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        
-        // app.js যাতে এই ফাংশনগুলো ব্যবহার করতে পারে, তার জন্য window তে সেট করে দিলাম
         window.auth = getAuth(app);
         window.database = getDatabase(app);
         window.signInWithEmailAndPassword = signInWithEmailAndPassword;
@@ -220,16 +203,8 @@
         window.dbOnValue = onValue;
         window.dbRemove = remove;
         window.dbUpdate = update;
-
-        console.log("Firebase Connected Successfully! 🎉");
     </script>
 
     <script src="app.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-            .then(() => console.log("Service Worker Active"));
-        }
-    </script>
 </body>
 </html>
