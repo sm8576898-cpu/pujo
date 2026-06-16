@@ -161,12 +161,12 @@
         </div>
     </div>
 
-    <!-- Admin Login Modal -->
+    <!-- Admin Login Modal (Fixed Email Box Spacing) -->
     <div id="auth-modal" class="modal-overlay hidden">
         <div class="auth-modal-content">
             <h3>🔒 অ্যাডমিন প্যানেল লগইন</h3>
             <p>সিস্টেমে নতুন এন্ট্রি বা এডিট করার জন্য ইমেইল ও পাসওয়ার্ড দিন</p>
-            <input type="email" id="admin-email" placeholder="অ্যাডমিন ইমেইল লিখুন">
+            <input type="email" id="admin-email" placeholder="ইমেইল" style="letter-spacing: normal; margin-bottom: 10px;">
             <input type="password" id="admin-password" placeholder="সিক্রেট পাসওয়ার্ড (PIN) লিখুন">
             
             <div class="auth-buttons">
@@ -206,5 +206,11 @@
     </script>
 
     <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then(() => console.log("Service Worker Active"));
+        }
+    </script>
 </body>
 </html>

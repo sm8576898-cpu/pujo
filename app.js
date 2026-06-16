@@ -1,13 +1,12 @@
 let isAdmin = false;
 let currentYear = new Date().getFullYear().toString(); 
 let currentCategory = ''; 
-let availableYears = []; // ডেটাবেস থেকে সালগুলো এখানে এসে জমা হবে
+let availableYears = []; 
 
 // =========================================
 // ১. ইনিশিয়ালাইজেশন এবং লগইন চেক
 // =========================================
 window.onload = () => {
-    // প্রথমেই ডেটাবেস থেকে সেভ করা সালগুলো লোড হবে
     setTimeout(() => {
         loadYearsFromDatabase();
         
@@ -42,7 +41,6 @@ function loadYearsFromDatabase() {
         if (snapshot.exists()) {
             availableYears = snapshot.val();
         } else {
-            // যদি ডেটাবেসে কোনো সাল না থাকে, তাহলে বর্তমান বছরটা যোগ করে দেবে
             availableYears = [currentYear];
             window.dbSet(yearsRef, availableYears);
         }
@@ -53,7 +51,6 @@ function loadYearsFromDatabase() {
 function renderYearSelector() {
     const yearSelect = document.getElementById('year-select');
     yearSelect.innerHTML = '';
-    // সালগুলো সাজিয়ে ড্রপডাউনে দেখানো
     availableYears.sort((a, b) => b - a).forEach(year => {
         let opt = document.createElement('option');
         opt.value = year;
@@ -63,17 +60,15 @@ function renderYearSelector() {
     });
 }
 
-// অ্যাডমিন নতুন বছর যোগ করার অপশন
 function openAddYearPrompt() {
     const newYear = prompt("নতুন পুজো বছর লিখুন (যেমন: 2027):");
     if (newYear && newYear.trim().length === 4 && !isNaN(newYear)) {
         if (!availableYears.includes(newYear)) {
             availableYears.push(newYear);
-            // ডেটাবেসে নতুন সাল সেভ করা
             window.dbSet(window.dbRef(window.database, 'system/years'), availableYears).then(() => {
-                currentYear = newYear; // কারেন্ট ইয়ার আপডেট করা
+                currentYear = newYear; 
                 renderYearSelector();
-                loadAllData(); // নতুন বছরের ফাঁকা ডেটা লোড করা
+                loadAllData(); 
                 alert(newYear + " সাল সফলভাবে যোগ করা হয়েছে!");
             });
         } else {
@@ -87,10 +82,9 @@ function openAddYearPrompt() {
     }
 }
 
-// ড্রপডাউন থেকে সাল পরিবর্তন করলে ডেটা আপডেট হবে
 function handleYearChange() {
     currentYear = document.getElementById('year-select').value;
-    loadAllData(); // যে বছর সিলেক্ট করবে, সেই বছরের ডেটা লোড হবে
+    loadAllData(); 
 }
 
 // =========================================
@@ -99,8 +93,10 @@ function handleYearChange() {
 function toggleAdminModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
 
 function submitAdminLogin() {
-    const email = document.getElementById('admin-email').value;
+    // .trim() অ্যাড করা হয়েছে যাতে স্পেস থাকলেও মুছে যায়
+    const email = document.getElementById('admin-email').value.trim(); 
     const password = document.getElementById('admin-password').value;
+    
     if (!email || !password) { alert("দয়া করে ইমেইল এবং পিন দিন!"); return; }
     window.signInWithEmailAndPassword(window.auth, email, password)
         .then(() => {
@@ -125,7 +121,7 @@ function loadAllData() {
     loadNotices();
     loadFinancialData();
     loadExpenses();
-    if (currentCategory) loadCategoryData(); // যদি কোনো মডাল খোলা থাকে সেটাও আপডেট হবে
+    if (currentCategory) loadCategoryData(); 
 }
 
 function loadNotices() {
@@ -159,7 +155,6 @@ function loadNotices() {
 }
 
 function loadFinancialData() {
-    // এখানে currentYear ব্যবহার করা হয়েছে, তাই সাল পাল্টালেই ডেটা পাল্টে যাবে
     const yearRef = window.dbRef(window.database, `funds/${currentYear}`);
     window.dbOnValue(yearRef, (snapshot) => {
         let totalIncome = 0; let totalExpense = 0;
@@ -323,7 +318,7 @@ function deleteData(path) {
 }
 
 // =========================================
-// ৯. ভিউ কাউন্টার লজিক (সবার জন্য)
+// ৯. ভিউ কাউন্টার লজিক
 // =========================================
 function setupViewCounter() {
     const viewsRef = window.dbRef(window.database, 'system/viewCount');
