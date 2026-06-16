@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>গ্রাম পুজো হিসাব খাতা</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#12121c">
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="main-header">
+        <div class="club-info-container">
+            <h1 id="display-club-name">🪔 আমাদের গ্রাম্য পুজো কমিটি</h1>
+            <p id="display-club-address">📍 গ্রাম + পোস্ট: বাগনান, উলুবেড়িয়া, হাওড়া</p>
+            <div id="display-club-contacts" class="contacts-grid">
+                <!-- Contacts will be generated dynamically -->
+            </div>
+        </div>
+        <div class="auth-box">
+            <button id="admin-login-btn" onclick="toggleAdminModal()">🔒 অ্যাডমিন লগইন</button>
+            <button id="admin-logout-btn" class="hidden" onclick="logoutAdmin()">🔓 লগআউট করুন</button>
+        </div>
+    </header>
+
+    <!-- Year & Main Fund Section -->
+    <main class="main-container">
+        <section class="control-panel">
+            <div class="year-selector-box">
+                <label for="year-select">📅 বছর বাছুন: </label>
+                <select id="year-select" onchange="handleYearChange()"></select>
+                <button id="add-year-btn" class="admin-only hidden" onclick="openAddYearPrompt()">➕ নতুন বছর যোগ করুন</button>
+            </div>
+
+            <!-- মূল তহবিল (Main Fund) -->
+            <div class="bokbhandar-card">
+                <h3>🪙 পুজো মূল তহবিল</h3>
+                <div class="fund-grid">
+                    <div class="fund-item income">
+                        <span>📈 মোট আদায়</span>
+                        <strong id="total-income">₹০.০০</strong>
+                    </div>
+                    <div class="fund-item expense">
+                        <span>📉 মোট খরচ</span>
+                        <strong id="total-expense">₹০.০০</strong>
+                    </div>
+                    <div class="fund-item balance">
+                        <span>💰 অবশিষ্ট তহবিল</span>
+                        <strong id="net-balance">₹০.০০</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Notice Board -->
+        <section class="notice-board-section">
+            <h3>📋 নোটিশ বোর্ড <span class="live-badge">লাইভ</span></h3>
+            <div id="notice-list" class="notice-container">
+                <!-- Notices here -->
+            </div>
+            <div class="admin-only hidden add-notice-form">
+                <input type="text" id="new-notice-text" placeholder="নতুন নোটিশ এখানে লিখুন...">
+                <button onclick="addNewNotice()">📢 নোটিশ দিন</button>
+            </div>
+        </section>
+
+        <!-- 3D Style Main Function Cards -->
+        <section class="cards-grid-container">
+            <div class="card-3d" onclick="openCategoryModal('mukto_haste', '🎁 মুক্ত হস্তে দান')">
+                <div class="card-icon">🎁</div>
+                <h3>মুক্ত হস্তে দান</h3>
+                <p>তালিকা ও মোট জমার হিসাব</p>
+            </div>
+            <div class="card-3d" onclick="openCategoryModal('guest_card', '🎟️ গেস্ট কার্ড বিতরণ')">
+                <div class="card-icon">🎟️</div>
+                <h3>গেস্ট কার্ড বিতরণ</h3>
+                <p>অতিথিদের বিশেষ কার্ডের হিসাব</p>
+            </div>
+            <div class="card-3d" onclick="openCategoryModal('matha_pichu', '👥 মাথা পিছু চাঁদা')">
+                <div class="card-icon">👥</div>
+                <h3>মাথা পিছু চাঁদা</h3>
+                <p>গ্রামের নিজস্ব চাঁদা সংগ্রহ</p>
+            </div>
+            <div class="card-3d" onclick="openCategoryModal('adhai', '🛍️ আদায় (অন্যান্য)')">
+                <div class="card-icon">🛍️</div>
+                <h3>আদায় (অন্যান্য)</h3>
+                <p>বিজ্ঞাপন ও বিবিধ সংগ্রহ</p>
+            </div>
+        </section>
+
+        <!-- Expense Section -->
+        <section class="expense-large-section">
+            <div class="section-header">
+                <h3>💸 পুজোর খরচের খতিয়ান</h3>
+            </div>
+            <div class="admin-only hidden expense-entry-box">
+                <h4>📝 নতুন খরচের হিসাব এন্ট্রি</h4>
+                <div class="form-row">
+                    <input type="text" id="exp-purpose" placeholder="খরচের খাত (যেমন: প্রতিমা, প্যান্ডেল)">
+                    <input type="number" id="exp-amount" placeholder="টাকার পরিমাণ (₹)">
+                    <input type="date" id="exp-date">
+                    <button onclick="addExpenseEntry()">➕ খরচ যোগ করুন</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>তারিখ</th>
+                            <th>খরচের বিবরণ</th>
+                            <th>টাকার পরিমাণ</th>
+                            <th class="admin-only hidden">অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expense-table-body">
+                        <!-- Data rows dynamically added -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Data Category Modal Container -->
+    <div id="data-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">বিবরণ</h3>
+                <span class="close-btn" onclick="closeCategoryModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="admin-only hidden data-entry-box">
+                    <h4>📝 নতুন এন্ট্রি ফরম</h4>
+                    <div class="form-row">
+                        <input type="text" id="data-name" placeholder="নাম / উৎসের বিবরণ">
+                        <input type="number" id="data-amount" placeholder="টাকার পরিমাণ (₹)">
+                        <input type="date" id="data-date">
+                        <button onclick="addCategoryDataEntry()">📥 সেভ করুন</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>তারিখ</th>
+                                <th>নাম / বিবরণ</th>
+                                <th>টাকার পরিমাণ</th>
+                                <th class="admin-only hidden">অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-table-body">
+                            <!-- Rows dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="auth-modal" class="modal-overlay hidden">
+        <div class="auth-modal-content">
+            <h3>🔒 অ্যাডমিন প্যানেল লগইন</h3>
+            <p>সিস্টেমে নতুন এন্ট্রি বা এডিট করার জন্য ইমেইল ও পাসওয়ার্ড দিন</p>
+            <input type="email" id="admin-email" placeholder="অ্যাডমিন ইমেইল লিখুন" style="letter-spacing: normal; margin-bottom: 10px;">
+            <input type="password" id="admin-password" placeholder="সিক্রেট পাসওয়ার্ড (PIN) লিখুন">
+            
+            <div class="auth-buttons">
+                <button class="login-submit-btn" onclick="submitAdminLogin()">লগইন করুন</button>
+                <button class="login-cancel-btn" onclick="toggleAdminModal()">বন্ধ করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Club Info Modal -->
+    <div id="club-edit-modal" class="modal-overlay hidden">
+        <div class="auth-modal-content">
+            <h3>📝 ক্লাবের সাধারণ তথ্য পরিবর্তন</h3>
+            <input type="text" id="edit-club-name" placeholder="ক্লাবের নাম">
+            <input type="text" id="edit-club-address" placeholder="ঠিকানা">
+            <input type="text" id="edit-club-contacts" placeholder="মোবাইল নম্বর (কমা দিয়ে একাধিক লিখতে পারেন)">
+            <div class="auth-buttons">
+                <button class="login-submit-btn" onclick="saveClubSettings()">সেভ করুন</button>
+                <button class="login-cancel-btn" onclick="toggleClubEditModal(false)">বাতিল</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Admin Edit trigger -->
+    <button id="quick-edit-club-btn" class="admin-only hidden floating-edit-btn" onclick="toggleClubEditModal(true)">⚙️ ক্লাব প্রোফাইল এডিট</button>
+
+    <!-- ফায়ারবেস (Firebase) কানেকশন স্ক্রিপ্ট -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        // তোমার আসল ফায়ারবেস প্রোজেক্টের কোড 
+        const firebaseConfig = {
+            apiKey: "AIzaSyD6QGPDanVqLK3gQSGD5SrklGfbpTki3K8",
+            authDomain: "pujo-cdfa5.firebaseapp.com",
+            projectId: "pujo-cdfa5",
+            storageBucket: "pujo-cdfa5.firebasestorage.app",
+            messagingSenderId: "868750000200",
+            appId: "1:868750000200:web:bba8b430da7b2814a5587d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        
+        // app.js যাতে এই ফাংশনগুলো ব্যবহার করতে পারে, তার জন্য window তে সেট করে দিলাম
+        window.auth = getAuth(app);
+        window.database = getDatabase(app);
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.dbRef = ref;
+        window.dbSet = set;
+        window.dbPush = push;
+        window.dbOnValue = onValue;
+        window.dbRemove = remove;
+        window.dbUpdate = update;
+
+        console.log("Firebase Connected Successfully! 🎉");
+    </script>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then(() => console.log("Service Worker Active"));
+        }
+    </script>
+</body>
+</html>

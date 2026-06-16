@@ -1,0 +1,97 @@
+/* Reset & Base Setup */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+body { background-color: #12121c; color: #e2e2ec; padding-bottom: 40px; }
+.hidden { display: none !important; }
+
+/* Header Area */
+.main-header { background: linear-gradient(135deg, #1a1a2e 0%, #161626 100%); border-bottom: 3px solid #ff9f43; padding: 20px; display: table; width: 100%; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+.club-info-container { display: table-cell; vertical-align: middle; }
+.club-info-container h1 { color: #ff9f43; font-size: 24px; margin-bottom: 5px; text-shadow: 1px 1px 4px rgba(0,0,0,0.6); }
+.club-info-container p { color: #a0a0b5; font-size: 14px; margin-bottom: 8px; }
+.contacts-grid { margin-top: 5px; }
+.contact-link { display: inline-block; background: #252538; color: #ffd700; padding: 4px 10px; border-radius: 20px; font-size: 13px; text-decoration: none; margin-right: 8px; margin-bottom: 5px; border: 1px solid #3d3d5c; }
+.auth-box { display: table-cell; vertical-align: middle; text-align: right; }
+.auth-box button, .floating-edit-btn { background-color: #ff4757; color: #fff; border: none; padding: 10px 16px; font-size: 14px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+#admin-login-btn { background-color: #ff9f43; color: #12121c; }
+
+/* Control Panel & Fund */
+.main-container { max-width: 1100px; margin: 0 auto; padding: 0 15px; }
+.control-panel { background: #1a1a2e; border-radius: 12px; padding: 20px; margin-bottom: 25px; border: 1px solid #282846; }
+.year-selector-box { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #282846; }
+.year-selector-box label { font-weight: bold; color: #ff9f43; }
+.year-selector-box select { background: #12121c; color: #fff; border: 2px solid #ff9f43; padding: 6px 12px; font-size: 15px; border-radius: 6px; outline: none; }
+.year-selector-box button { background: #2ed573; color: #fff; border: none; padding: 7px 12px; font-size: 13px; font-weight: bold; border-radius: 6px; margin-left: 10px; cursor: pointer; }
+
+/* Fund Grid Styling */
+.bokbhandar-card h3 { margin-bottom: 15px; color: #ffd700; }
+.fund-grid { display: table; width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 12px 0; }
+.fund-item { display: table-cell; background: #22223b; padding: 15px; border-radius: 10px; text-align: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
+.fund-item span { display: block; font-size: 13px; color: #a0a0b5; margin-bottom: 5px; }
+.fund-item strong { font-size: 20px; }
+.fund-item.income strong { color: #2ed573; }
+.fund-item.expense strong { color: #ff4757; }
+.fund-item.balance strong { color: #ffd700; }
+
+/* Notice Board */
+.notice-board-section { background: #1e1e30; border-left: 5px solid #ff4757; border-radius: 4px 12px 12px 4px; padding: 15px; margin-bottom: 30px; }
+.notice-board-section h3 { font-size: 16px; color: #fff; margin-bottom: 10px; }
+.live-badge { background: #ff4757; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 6px; text-transform: uppercase; }
+.notice-container { max-height: 180px; overflow-y: auto; }
+.notice-item { background: #141424; padding: 10px 12px; border-radius: 6px; font-size: 14px; margin-bottom: 6px; border-bottom: 1px solid #25253d; }
+.notice-date { color: #ff9f43; font-size: 11px; margin-right: 8px; font-weight: bold; }
+.notice-actions { margin-top: 8px; }
+.add-notice-form { margin-top: 10px; }
+.add-notice-form input { width: 75%; padding: 8px; background: #12121c; border: 1px solid #3d3d5c; color: #fff; border-radius: 6px; }
+.add-notice-form button { width: 22%; padding: 8px; background: #ff4757; border: none; color: #fff; border-radius: 6px; cursor: pointer; }
+
+/* 3D Cards Layout Grid */
+.cards-grid-container { display: table; width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 15px 0; margin-bottom: 30px; }
+.card-3d { display: table-cell; background: #1a1a2e; border-radius: 15px; padding: 25px 15px; text-align: center; cursor: pointer; position: relative; box-shadow: 0 8px 0 #0f0f1d, 0 12px 20px rgba(0,0,0,0.5); transition: transform 0.15s ease, box-shadow 0.15s ease; vertical-align: top; }
+.card-3d:hover { transform: translateY(-4px); box-shadow: 0 12px 0 #0f0f1d, 0 16px 25px rgba(0,0,0,0.6); }
+.card-3d:active { transform: translateY(6px); box-shadow: 0 2px 0 #0f0f1d, 0 4px 10px rgba(0,0,0,0.4); }
+.card-icon { font-size: 32px; margin-bottom: 12px; }
+.card-3d h3 { font-size: 17px; color: #fff; margin-bottom: 6px; }
+.card-3d p { font-size: 12px; color: #a0a0b5; }
+
+/* Large Bottom Expense Section */
+.expense-large-section { background: #1a1a2e; border-radius: 12px; padding: 20px; border: 1px solid #282846; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+.section-header h3 { color: #ff4757; margin-bottom: 15px; font-size: 18px; }
+
+/* Forms layout inside tables/modals */
+.form-row { background: #22223b; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
+.form-row input { background: #12121c; color: #fff; border: 1px solid #3d3d5c; padding: 8px 12px; font-size: 14px; border-radius: 6px; margin-right: 8px; outline: none; }
+.form-row button { background: #2ed573; color: #fff; border: none; padding: 8px 15px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+
+/* Responsive Table Elements & Edit/Delete Buttons */
+.table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; }
+table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+th, td { padding: 12px; border-bottom: 1px solid #25253d; }
+th { background-color: #151525; color: #ff9f43; font-weight: bold; }
+tbody tr:nth-child(even) { background-color: #1c1c32; }
+
+.edit-entry-btn { background: #3498db; color: #fff; border: none; padding: 4px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+.delete-entry-btn { background: #ff4757; color: #fff; border: none; padding: 4px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; }
+
+/* Overlay & Modals */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 1000; display: block; }
+.modal-content { background: #1a1a2e; width: 90%; max-width: 750px; margin: 50px auto; border-radius: 12px; border: 1px solid #ff9f43; overflow: hidden; }
+.modal-header { background: #151525; padding: 15px; border-bottom: 2px solid #ff9f43; position: relative; }
+.modal-header h3 { color: #fff; }
+.close-btn { position: absolute; right: 20px; top: 12px; font-size: 28px; color: #a0a0b5; cursor: pointer; }
+.close-btn:hover { color: #fff; }
+.modal-body { padding: 20px; max-height: 75vh; overflow-y: auto; }
+
+/* Auth Box */
+.auth-modal-content { background: #1a1a2e; width: 320px; margin: 150px auto; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #3d3d5c; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+.auth-modal-content h3 { font-size: 16px; margin-bottom: 10px; color: #ff9f43; }
+.auth-modal-content p { font-size: 12px; color: #a0a0b5; margin-bottom: 15px; }
+
+.auth-modal-content input { width: 100%; padding: 10px; background: #12121c; border: 1px solid #3d3d5c; color: #fff; text-align: center; font-size: 16px; letter-spacing: 4px; border-radius: 6px; margin-bottom: 15px; }
+
+/* প্লেসহোল্ডারের স্পেসিং নরমাল করার জন্য এই লাইনটা যোগ করা হলো */
+.auth-modal-content input::placeholder { letter-spacing: normal; }
+
+.auth-buttons button { width: 48%; padding: 8px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; }
+.login-submit-btn { background: #2ed573; color: #fff; margin-right: 2%; }
+.login-cancel-btn { background: #4b4b61; color: #fff; }
+.floating-edit-btn { position: fixed; bottom: 20px; right: 20px; z-index: 999; background: #ffd700; color: #12121c; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
