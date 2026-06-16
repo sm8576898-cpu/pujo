@@ -1,4 +1,4 @@
-const CACHE_NAME = 'puja-hisab-v1';
+const CACHE_NAME = 'puja-hisab-v2'; // ভার্সন v2 করে দেওয়া হলো
 const urlsToCache = [
   '/',
   '/index.html',
@@ -7,22 +7,32 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Service Worker Install
 self.addEventListener('install', event => {
+  // পুরনো ক্যাশ ডিলিট করে নতুনটা ইনস্টল করবে
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
 });
 
-// Fetch Data
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // ফায়ারবেসের ডেটাবেস রিকোয়েস্টগুলো ক্যাশ না করে সরাসরি নেটওয়ার্ক থেকে নেবে
         if (event.request.url.includes('firebaseio.com') || event.request.url.includes('googleapis.com')) {
             return fetch(event.request);
         }
