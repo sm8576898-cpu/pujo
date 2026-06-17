@@ -33,7 +33,7 @@ window.onload = () => {
 };
 
 // =========================================
-// ২. বছর বা সাল কন্ট্রোল (Year Management)
+// ২. বছর বা সাল কন্ট্রোল
 // =========================================
 function loadYearsFromDatabase() {
     const yearsRef = window.dbRef(window.database, 'system/years');
@@ -93,7 +93,6 @@ function handleYearChange() {
 function toggleAdminModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
 
 function submitAdminLogin() {
-    // .trim() অ্যাড করা হয়েছে যাতে স্পেস থাকলেও মুছে যায়
     const email = document.getElementById('admin-email').value.trim(); 
     const password = document.getElementById('admin-password').value;
     
@@ -115,7 +114,7 @@ function logoutAdmin() {
 }
 
 // =========================================
-// ৪. ডেটা লোড করা (Notices, Funds, Expenses)
+// ৪. ডেটা লোড করা 
 // =========================================
 function loadAllData() {
     loadNotices();
@@ -182,10 +181,10 @@ function loadExpenses() {
                 const item = data[key];
                 const safePurpose = item.purpose.replace(/"/g, '&quot;');
                 const actionHtml = isAdmin ? `
-                    <td class="admin-only" style="white-space: nowrap;">
+                    <td class="admin-only no-print" style="white-space: nowrap;">
                         <button class="edit-entry-btn" data-purpose="${safePurpose}" data-amount="${item.amount}" onclick="editExpense('${key}', this.getAttribute('data-purpose'), this.getAttribute('data-amount'))">এডিট</button>
                         <button class="delete-entry-btn" onclick="deleteData('funds/${currentYear}/expenses/${key}')">ডিলিট</button>
-                    </td>` : '<td class="admin-only hidden"></td>';
+                    </td>` : '<td class="admin-only hidden no-print"></td>';
                 
                 tbody.innerHTML += `
                     <tr>
@@ -203,12 +202,14 @@ function loadExpenses() {
 }
 
 // =========================================
-// ৫. মডাল ও ক্যাটাগরি ডেটা
+// ৫. মডাল ও ক্যাটাগরি ডেটা (উইথ হোয়াটসঅ্যাপ শেয়ার)
 // =========================================
 function openCategoryModal(categoryId, title) {
     currentCategory = categoryId;
     document.getElementById('modal-title').innerText = title;
     document.getElementById('data-modal').classList.remove('hidden');
+    // মডাল খোলার সময় সার্চ বক্স ফাঁকা করা
+    document.getElementById('search-modal').value = '';
     loadCategoryData();
 }
 
@@ -228,11 +229,18 @@ function loadCategoryData() {
             Object.keys(data).reverse().forEach(key => {
                 const item = data[key];
                 const safeName = item.name.replace(/"/g, '&quot;');
-                const actionHtml = isAdmin ? `
-                    <td class="admin-only" style="white-space: nowrap;">
-                        <button class="edit-entry-btn" data-name="${safeName}" data-amount="${item.amount}" onclick="editCategory('${key}', this.getAttribute('data-name'), this.getAttribute('data-amount'))">এডিট</button>
-                        <button class="delete-entry-btn" onclick="deleteData('funds/${currentYear}/${currentCategory}/${key}')">ডিলিট</button>
-                    </td>` : '<td class="admin-only hidden"></td>';
+                
+                const editDelHtml = isAdmin ? `
+                    <button class="edit-entry-btn" data-name="${safeName}" data-amount="${item.amount}" onclick="editCategory('${key}', this.getAttribute('data-name'), this.getAttribute('data-amount'))">এডিট</button>
+                    <button class="delete-entry-btn" onclick="deleteData('funds/${currentYear}/${currentCategory}/${key}')">ডিলিট</button>
+                ` : '';
+                
+                // শেয়ার বাটন সবার জন্য, এডিট/ডিলিট অ্যাডমিনের জন্য
+                const actionHtml = `
+                    <td class="no-print" style="white-space: nowrap;">
+                        <button onclick="shareWhatsApp('${safeName}', '${item.amount}')" style="background:#25D366;color:white;border:none;padding:5px 8px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:5px;">💬 শেয়ার</button>
+                        ${editDelHtml}
+                    </td>`;
                 
                 tbody.innerHTML += `
                     <tr>
@@ -337,4 +345,67 @@ function setupViewCounter() {
             sessionStorage.setItem('hasCountedView', 'true');
         }, { onlyOnce: true });
     }
+}
+
+// =========================================
+// ১০. লাইভ সার্চ (Live Search)
+// =========================================
+function searchTable(inputId, tbodyId) {
+    let input = document.getElementById(inputId).value.toLowerCase();
+    let rows = document.getElementById(tbodyId).getElementsByTagName('tr');
+    
+    for (let i = 0; i < rows.length; i++) {
+        // শুধুমাত্র "নাম/বিবরণ" কলাম (index 1) এ সার্চ করা হচ্ছে
+        let text = rows[i].getElementsByTagName('td')[1];
+        if (text) {
+            let textValue = text.innerText.toLowerCase();
+            if (textValue.includes(input)) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+}
+
+// =========================================
+// ১১. হোয়াটসঅ্যাপ শেয়ার (WhatsApp Share)
+// =========================================
+function shareWhatsApp(name, amount) {
+    const message = `নমস্কার ${name}, গ্রাম পুজো কমিটির তরফ থেকে জানানো হচ্ছে যে, আপনার দেওয়া ${amount} টাকা সফলভাবে পুজো তহবিলে জমা হয়েছে। ধন্যবাদ! 🙏`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+// =========================================
+// ১২. পিডিএফ / প্রিন্ট রিপোর্ট (PDF / Print)
+// =========================================
+function printSection(title, containerId) {
+    let tableHtml = document.getElementById(containerId).innerHTML;
+    let printWindow = window.open('', '', 'height=600,width=800');
+    
+    printWindow.document.write('<html><head><title>' + title + ' রিপোর্ট</title>');
+    // প্রিন্ট পেজের জন্য আলাদা ডিজাইন দেওয়া হলো, যেখানে অ্যাকশন বাটনগুলো হাইড করা থাকবে
+    printWindow.document.write(`
+        <style>
+            body { font-family: sans-serif; padding: 20px; color: black; }
+            h2 { text-align: center; color: #333; margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+            th, td { border: 1px solid #333; padding: 10px; text-align: left; }
+            th { background-color: #f2f2f2; color: black; font-weight: bold; }
+            .no-print { display: none !important; } /* অ্যাকশন কলাম হাইড করার জন্য */
+            .hidden { display: none !important; }
+        </style>
+    `);
+    printWindow.document.write('</head><body>');
+    printWindow.document.write('<h2>' + title + ' (' + currentYear + ' সাল)</h2>');
+    printWindow.document.write(tableHtml);
+    printWindow.document.write('</body></html>');
+    
+    printWindow.document.close();
+    
+    // পেজটা রেডি হতে একটু সময় দিয়ে প্রিন্ট ডায়লগ ওপেন করা
+    setTimeout(() => {
+        printWindow.print();
+    }, 500);
 }

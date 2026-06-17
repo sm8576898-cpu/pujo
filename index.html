@@ -33,7 +33,6 @@
             <div class="year-selector-box" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <label for="year-select">📅 বছর বাছুন: </label>
                 <select id="year-select" onchange="handleYearChange()" style="padding: 5px; border-radius: 5px;"></select>
-                <!-- অ্যাডমিন বাটন: নতুন বছর যোগ করার জন্য -->
                 <button id="add-year-btn" class="admin-only hidden" onclick="openAddYearPrompt()" style="background: #2ed573; color: #12121c; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold;">➕ নতুন বছর যোগ করুন</button>
             </div>
 
@@ -60,9 +59,7 @@
         <!-- Notice Board -->
         <section class="notice-board-section">
             <h3>📋 নোটিশ বোর্ড <span class="live-badge">লাইভ</span></h3>
-            <div id="notice-list" class="notice-container">
-                <!-- Notices here -->
-            </div>
+            <div id="notice-list" class="notice-container"></div>
             <div class="admin-only hidden add-notice-form">
                 <input type="text" id="new-notice-text" placeholder="নতুন নোটিশ এখানে লিখুন...">
                 <button onclick="addNewNotice()">📢 নোটিশ দিন</button>
@@ -95,10 +92,16 @@
 
         <!-- Expense Section -->
         <section class="expense-large-section">
-            <div class="section-header">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <h3>💸 পুজোর খরচের খতিয়ান</h3>
+                <!-- নতুন: সার্চ বক্স এবং প্রিন্ট বাটন -->
+                <div>
+                    <input type="text" id="search-expense" onkeyup="searchTable('search-expense', 'expense-table-body')" placeholder="🔍 বিবরণ খুঁজুন..." style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; color: black; margin-right: 5px; width: 150px;">
+                    <button onclick="printSection('খরচের খতিয়ান', 'expense-table-container')" style="background: #3498db; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;">🖨️ PDF / প্রিন্ট</button>
+                </div>
             </div>
-            <div class="admin-only hidden expense-entry-box">
+            
+            <div class="admin-only hidden expense-entry-box" style="margin-top: 15px;">
                 <h4>📝 নতুন খরচের হিসাব এন্ট্রি</h4>
                 <div class="form-row">
                     <input type="text" id="exp-purpose" placeholder="খরচের খাত (যেমন: প্রতিমা, প্যান্ডেল)">
@@ -107,14 +110,15 @@
                     <button onclick="addExpenseEntry()">➕ খরচ যোগ করুন</button>
                 </div>
             </div>
-            <div class="table-responsive">
+            
+            <div id="expense-table-container" class="table-responsive">
                 <table>
                     <thead>
                         <tr>
                             <th>তারিখ</th>
                             <th>খরচের বিবরণ</th>
                             <th>টাকার পরিমাণ</th>
-                            <th class="admin-only hidden">অ্যাকশন</th>
+                            <th class="admin-only hidden no-print">অ্যাকশন</th>
                         </tr>
                     </thead>
                     <tbody id="expense-table-body">
@@ -128,11 +132,17 @@
     <!-- Data Category Modal Container -->
     <div id="data-modal" class="modal-overlay hidden">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid #282846; padding-bottom: 10px;">
                 <h3 id="modal-title">বিবরণ</h3>
-                <span class="close-btn" onclick="closeCategoryModal()">&times;</span>
+                <!-- নতুন: সার্চ বক্স এবং প্রিন্ট বাটন -->
+                <div>
+                    <input type="text" id="search-modal" onkeyup="searchTable('search-modal', 'modal-table-body')" placeholder="🔍 নাম খুঁজুন..." style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; color: black; margin-right: 5px; width: 130px;">
+                    <button onclick="printSection(document.getElementById('modal-title').innerText, 'modal-table-container')" style="background: #3498db; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;">🖨️ PDF</button>
+                    <span class="close-btn" onclick="closeCategoryModal()" style="margin-left: 10px; font-size: 24px;">&times;</span>
+                </div>
             </div>
-            <div class="modal-body">
+            
+            <div class="modal-body" style="padding-top: 15px;">
                 <div class="admin-only hidden data-entry-box">
                     <h4>📝 নতুন এন্ট্রি ফরম</h4>
                     <div class="form-row">
@@ -142,14 +152,15 @@
                         <button onclick="addCategoryDataEntry()">📥 সেভ করুন</button>
                     </div>
                 </div>
-                <div class="table-responsive">
+                
+                <div id="modal-table-container" class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <th>তারিখ</th>
                                 <th>নাম / বিবরণ</th>
                                 <th>টাকার পরিমাণ</th>
-                                <th class="admin-only hidden">অ্যাকশন</th>
+                                <th class="no-print">অ্যাকশন</th> <!-- Action remains visible for WhatsApp Share -->
                             </tr>
                         </thead>
                         <tbody id="modal-table-body">
@@ -161,7 +172,7 @@
         </div>
     </div>
 
-    <!-- Admin Login Modal (Fixed Email Box Spacing) -->
+    <!-- Admin Login Modal -->
     <div id="auth-modal" class="modal-overlay hidden">
         <div class="auth-modal-content">
             <h3>🔒 অ্যাডমিন প্যানেল লগইন</h3>
@@ -183,7 +194,7 @@
         import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyD6QGPDanVqLK3gQSGD5SrklGfbpTki3K8",
+            apiKey: "AIzaSyD6QGPDanVqLk3gQSGD5SrklGfbpTki3K8",
             authDomain: "pujo-cdfa5.firebaseapp.com",
             projectId: "pujo-cdfa5",
             storageBucket: "pujo-cdfa5.firebasestorage.app",
