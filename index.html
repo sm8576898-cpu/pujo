@@ -10,17 +10,19 @@
 </head>
 <body>
 
-    <div style="text-align: center; background: #1a1a2e; padding: 10px; color: #2ed573; font-weight: bold; border-bottom: 2px solid #282846;">
+    <!-- View Counter Header Section -->
+    <div style="text-align: center; background: #1a1a2e; padding: 10px; color: #2ed573; font-weight: bold; border-bottom: 2px solid #282846; font-size: 15px;">
         👁️ মোট অ্যাপ ভিজিটর: <span id="app-view-count">০</span>
     </div>
 
+    <!-- Header Section -->
     <header class="main-header">
         <div class="club-info-container">
             <h1 id="display-club-name">🪔 আমাদের গ্রাম্য পুজো কমিটি</h1>
             <p id="display-club-address">📍 গ্রাম + পোস্ট: বাগনান, উলুবেড়িয়া, হাওড়া</p>
-            <p id="display-club-contact" style="color: #ffd700; font-size: 13px; margin-top: 5px; font-weight: bold;">📞 মোবাইল: লোড হচ্ছে... | 📅 পুজোর তারিখ: লোড হচ্ছে...</p>
+            <p id="display-club-contact" style="color: #ffd700; font-size: 14px; margin-top: 5px; font-weight: bold;">📞 মোবাইল: লোড হচ্ছে... | 📅 পুজোর তারিখ: লোড হচ্ছে...</p>
             
-            <button class="admin-only hidden no-print" onclick="openClubEditModal()" style="margin-top: 12px; background: #ffd700; color: #12121c; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">⚙️ ক্লাব প্রোফাইল ও তারিখ এডিট করুন</button>
+            <button class="admin-only hidden no-print" onclick="openClubEditModal()" style="margin-top: 12px; background: #ffd700; color: #12121c; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">⚙️ ক্লাব প্রোফাইল ও তারিখ এডিট করুন</button>
         </div>
         <div class="auth-box">
             <button id="admin-login-btn" onclick="toggleAdminModal()">🔒 অ্যাডমিন লগইন</button>
@@ -28,16 +30,17 @@
         </div>
     </header>
 
+    <!-- Main Container (চওড়া ও মিডিয়াম সাইজ) -->
     <main class="main-container">
         <section class="control-panel">
             <div class="year-selector-box" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <label for="year-select">📅 বছর বাছুন: </label>
-                <select id="year-select" onchange="handleYearChange()" style="padding: 5px; border-radius: 5px;"></select>
-                <button id="add-year-btn" class="admin-only hidden" onclick="openAddYearPrompt()" style="background: #2ed573; color: #12121c; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">➕ নতুন বছর যোগ করুন</button>
-                
-                <button class="admin-only hidden no-print" onclick="openClubEditModal()" style="background: #f39c12; color: #fff; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">⚙️ ক্লাব প্রোফাইল এডিট</button>
+                <select id="year-select" onchange="handleYearChange()"></select>
+                <button id="add-year-btn" class="admin-only hidden" onclick="openAddYearPrompt()" style="background: #2ed573; color: #12121c; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">➕ নতুন বছর যোগ করুন</button>
+                <button class="admin-only hidden no-print" onclick="openClubEditModal()" style="background: #f39c12; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">⚙️ ক্লাব প্রোফাইল এডিট</button>
             </div>
 
+            <!-- মূল তহবিল -->
             <div class="bokbhandar-card">
                 <h3>🪙 পুজো মূল তহবিল</h3>
                 <div class="fund-grid">
@@ -57,6 +60,7 @@
             </div>
         </section>
 
+        <!-- Notice Board -->
         <section class="notice-board-section">
             <h3>📋 নোটিশ বোর্ড <span class="live-badge">লাইভ</span></h3>
             <div id="notice-list" class="notice-container"></div>
@@ -66,6 +70,7 @@
             </div>
         </section>
 
+        <!-- 3D Style Main Function Cards -->
         <section class="cards-grid-container">
             <div class="card-3d" onclick="openCategoryModal('mukto_haste', '🎁 মুক্ত হস্তে দান')">
                 <div class="card-icon">🎁</div>
@@ -89,12 +94,36 @@
             </div>
         </section>
 
+        <!-- ========================================= -->
+        <!-- নতুন: Gallery & Document Section (Max 1MB) -->
+        <!-- ========================================= -->
+        <section class="gallery-section">
+            <h3>🖼️ পুজো গ্যালারি ও ডকুমেন্ট (ছবি / PDF) <span class="live-badge" style="background:#2ed573;">লাইভ</span></h3>
+            
+            <!-- অ্যাডমিন আপলোড বক্স (সর্বোচ্চ 1MB) -->
+            <div class="admin-only hidden gallery-upload-box">
+                <h4 style="color:#ff9f43; margin-bottom:10px;">📤 নতুন ছবি বা PDF আপলোড করুন (সর্বোচ্চ ১ এমবি / 1MB)</h4>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <input type="file" id="gallery-file-input" accept="image/*,.pdf" style="background:#12121c; padding:8px; border:1px solid #3d3d5c; border-radius:6px; color:#fff; flex: 1; min-width: 200px;">
+                    <input type="text" id="gallery-title" placeholder="ছবি বা ডকুমেন্টের নাম / বিবরণ..." style="padding:10px; background:#12121c; border:1px solid #3d3d5c; color:#fff; border-radius:6px; flex: 1; min-width: 200px;">
+                    <button onclick="uploadToGallery()" style="background:#2ed573; color:#12121c; font-weight:bold; padding:10px 20px; border:none; border-radius:6px; cursor:pointer;">📤 আপলোড করুন</button>
+                </div>
+                <p style="color:#ff4757; font-size:12px; margin-top:8px;">* সতর্কবার্তা: ফাইল সাইজ কোনোভাবেই 1MB-র বেশি হওয়া যাবে না।</p>
+            </div>
+
+            <!-- গ্যালারি গ্রিড (যেখানে ছবি ও PDF লোড হবে) -->
+            <div id="gallery-grid" class="gallery-grid">
+                <!-- ডায়নামিক ছবি ও ডকুমেন্ট এখানে লোড হবে -->
+            </div>
+        </section>
+
+        <!-- Expense Section -->
         <section class="expense-large-section">
             <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <h3>💸 পুজোর খরচের খতিয়ান</h3>
                 <div>
-                    <input type="text" id="search-expense" onkeyup="searchTable('search-expense', 'expense-table-body')" placeholder="🔍 বিবরণ খুঁজুন..." style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; color: black; margin-right: 5px; width: 150px;">
-                    <button onclick="printSection('খরচের খতিয়ান', 'expense-table-container')" style="background: #3498db; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;">🖨️ PDF / প্রিন্ট</button>
+                    <input type="text" id="search-expense" onkeyup="searchTable('search-expense', 'expense-table-body')" placeholder="🔍 বিবরণ খুঁজুন..." style="padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; color: black; margin-right: 5px; width: 180px;">
+                    <button onclick="printSection('খরচের খতিয়ান', 'expense-table-container')" style="background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">🖨️ PDF / প্রিন্ট</button>
                 </div>
             </div>
             
@@ -119,19 +148,20 @@
                         </tr>
                     </thead>
                     <tbody id="expense-table-body">
-                        </tbody>
+                        <!-- Data rows dynamically added -->
+                    </tbody>
                 </table>
             </div>
         </section>
     </main>
 
+    <!-- Data Category Modal Container -->
     <div id="data-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 2px solid #ff9f43; padding: 15px; background: #151525;">
                 <h3 id="modal-title" style="margin: 0; color: #fff;">বিবরণ</h3>
-                
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <input type="text" id="search-modal" onkeyup="searchTable('search-modal', 'modal-table-body')" placeholder="🔍 নাম খুঁজুন..." style="padding: 6px 10px; border-radius: 5px; border: 1px solid #ccc; color: black; width: 140px;">
+                    <input type="text" id="search-modal" onkeyup="searchTable('search-modal', 'modal-table-body')" placeholder="🔍 নাম খুঁজুন..." style="padding: 6px 10px; border-radius: 5px; border: 1px solid #ccc; color: black; width: 150px;">
                     <button onclick="printSection(document.getElementById('modal-title').innerText, 'modal-table-container')" style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;">🖨️ PDF</button>
                     <button onclick="closeCategoryModal()" style="background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;">❌ বন্ধ করুন</button>
                 </div>
@@ -159,27 +189,29 @@
                             </tr>
                         </thead>
                         <tbody id="modal-table-body">
-                            </tbody>
+                            <!-- Rows dynamic -->
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Club Profile Edit Modal -->
     <div id="club-edit-modal" class="modal-overlay hidden">
         <div class="auth-modal-content" style="width: 90%; max-width: 420px; text-align: left;">
             <h3 style="text-align: center; border-bottom: 1px solid #3d3d5c; padding-bottom: 10px;">⚙️ ক্লাব প্রোফাইল ও তারিখ এডিট</h3>
             <div style="margin-top: 15px;">
-                <label style="color: #ff9f43; font-size: 13px; font-weight: bold;">🪔 ক্লাবের নাম:</label>
+                <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">🪔 ক্লাবের নাম:</label>
                 <input type="text" id="edit-club-name" placeholder="যেমন: আমাদের গ্রাম্য পুজো কমিটি" style="margin-top: 5px; margin-bottom: 12px; text-align: left; letter-spacing: normal;">
                 
-                <label style="color: #ff9f43; font-size: 13px; font-weight: bold;">📍 ঠিকানা (গ্রাম + পোস্ট):</label>
+                <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">📍 ঠিকানা (গ্রাম + পোস্ট):</label>
                 <input type="text" id="edit-club-address" placeholder="যেমন: বাগনান, উলুবেড়িয়া, হাওড়া" style="margin-top: 5px; margin-bottom: 12px; text-align: left; letter-spacing: normal;">
                 
-                <label style="color: #ff9f43; font-size: 13px; font-weight: bold;">📞 মোবাইল নম্বর (যোগাযোগ):</label>
+                <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">📞 মোবাইল নম্বর (যোগাযোগ):</label>
                 <input type="text" id="edit-club-mobile" placeholder="যেমন: 9876543210 / 8765432109" style="margin-top: 5px; margin-bottom: 12px; text-align: left; letter-spacing: normal;">
                 
-                <label style="color: #ff9f43; font-size: 13px; font-weight: bold;">📅 পুজোর তারিখ / দিনক্ষণ:</label>
+                <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">📅 পুজোর তারিখ / দিনক্ষণ:</label>
                 <input type="text" id="edit-club-date" placeholder="যেমন: ২০ - ২৪ অক্টোবর ২০২৬ (ষষ্ঠী থেকে দশমী)" style="margin-top: 5px; margin-bottom: 15px; text-align: left; letter-spacing: normal;">
             </div>
             
@@ -190,10 +222,11 @@
         </div>
     </div>
 
+    <!-- Admin Login Modal -->
     <div id="auth-modal" class="modal-overlay hidden">
         <div class="auth-modal-content">
             <h3>🔒 অ্যাডমিন প্যানেল লগইন</h3>
-            <p>সিস্টেমে নতুন এন্ট্রি বা এডিট করার জন্য ইমেইল ও পাসওয়ার্ড দিন</p>
+            <p style="margin-bottom: 15px;">সিস্টেমে নতুন এন্ট্রি বা এডিট করার জন্য ইমেইল ও পাসওয়ার্ড দিন</p>
             <input type="email" id="admin-email" placeholder="ইমেইল" style="letter-spacing: normal; margin-bottom: 15px;">
             
             <div style="position: relative; margin-bottom: 15px;">
@@ -208,6 +241,7 @@
         </div>
     </div>
 
+    <!-- ফায়ারবেস (Firebase) কানেকশন স্ক্রিপ্ট -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
