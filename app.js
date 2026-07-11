@@ -89,7 +89,7 @@ function handleYearChange() {
 }
 
 // =========================================
-// ৩. অ্যাডমিন লগইন / লগআউট কন্ট্রোল উইথ Eye Toggle
+// ৩. অ্যাডমিন লগইন / লগআউট কন্ট্রোল
 // =========================================
 function toggleAdminModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
 
@@ -194,8 +194,9 @@ function loadAllData() {
     if (currentCategory) loadCategoryData(); 
 }
 
+// **এখানে নোটিশ লোড করার কোড আপডেট করা হয়েছে যাতে শুধু সিলেক্ট করা সালের নোটিশ আসে**
 function loadNotices() {
-    const noticesRef = window.dbRef(window.database, 'notices');
+    const noticesRef = window.dbRef(window.database, `notices/${currentYear}`);
     window.dbOnValue(noticesRef, (snapshot) => {
         const noticeList = document.getElementById('notice-list');
         noticeList.innerHTML = '';
@@ -207,7 +208,7 @@ function loadNotices() {
                 const actionHtml = isAdmin ? `
                     <div style="margin-top:5px;">
                         <button class="edit-entry-btn" data-text="${safeText}" onclick="editNotice('${key}', this.getAttribute('data-text'))">এডিট</button>
-                        <button class="delete-entry-btn" onclick="deleteData('notices/${key}')">ডিলিট</button>
+                        <button class="delete-entry-btn" onclick="deleteData('notices/${currentYear}/${key}')">ডিলিট</button>
                     </div>` : '';
                 
                 noticeList.innerHTML += `
@@ -219,7 +220,7 @@ function loadNotices() {
                 `;
             });
         } else {
-            noticeList.innerHTML = '<p style="color:#a0a0b5; font-size:13px;">কোনো নোটিশ নেই।</p>';
+            noticeList.innerHTML = '<p style="color:#a0a0b5; font-size:13px;">এই সালের কোনো নোটিশ নেই।</p>';
         }
     });
 }
@@ -273,7 +274,7 @@ function loadExpenses() {
 }
 
 // =========================================
-// ৬. মডাল ও ক্যাটাগরি ডেটা (উইথ হোয়াটসঅ্যাপ শেয়ার)
+// ৬. মডাল ও ক্যাটাগরি ডেটা
 // =========================================
 function openCategoryModal(categoryId, title) {
     currentCategory = categoryId;
@@ -329,11 +330,12 @@ function loadCategoryData() {
 // =========================================
 // ৭. ডেটা সেভ করা (Add)
 // =========================================
+// **এখানে নতুন নোটিশ নির্দিষ্ট সালে সেভ করার কোড আপডেট করা হয়েছে**
 function addNewNotice() {
     const text = document.getElementById('new-notice-text').value;
     if (!text) { alert("নোটিশ ফাঁকা রাখা যাবে না!"); return; }
     const dateStr = new Date().toLocaleDateString('bn-IN');
-    window.dbPush(window.dbRef(window.database, 'notices'), { text: text, date: dateStr })
+    window.dbPush(window.dbRef(window.database, `notices/${currentYear}`), { text: text, date: dateStr })
         .then(() => document.getElementById('new-notice-text').value = '');
 }
 
@@ -361,7 +363,7 @@ function addCategoryDataEntry() {
 function editNotice(key, currentText) {
     const newText = prompt("নোটিশ আপডেট করুন:", currentText);
     if (newText !== null && newText.trim() !== "" && newText !== currentText) {
-        window.dbUpdate(window.dbRef(window.database, `notices/${key}`), { text: newText });
+        window.dbUpdate(window.dbRef(window.database, `notices/${currentYear}/${key}`), { text: newText });
     }
 }
 
