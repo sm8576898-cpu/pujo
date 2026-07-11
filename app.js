@@ -185,16 +185,16 @@ function saveClubDetails() {
 }
 
 // =========================================
-// ৫. ডেটা লোড করা (Notices, Funds, Expenses)
+// ৫. ডেটা লোড করা (Notices, Funds, Expenses, Gallery)
 // =========================================
 function loadAllData() {
     loadNotices();
     loadFinancialData();
     loadExpenses();
+    loadGallery(); // নতুন: গ্যালারি লোড হবে
     if (currentCategory) loadCategoryData(); 
 }
 
-// **এখানে নোটিশ লোড করার কোড আপডেট করা হয়েছে যাতে শুধু সিলেক্ট করা সালের নোটিশ আসে**
 function loadNotices() {
     const noticesRef = window.dbRef(window.database, `notices/${currentYear}`);
     window.dbOnValue(noticesRef, (snapshot) => {
@@ -206,7 +206,7 @@ function loadNotices() {
                 const notice = data[key];
                 const safeText = notice.text.replace(/"/g, '&quot;');
                 const actionHtml = isAdmin ? `
-                    <div style="margin-top:5px;">
+                    <div style="margin-top:8px;">
                         <button class="edit-entry-btn" data-text="${safeText}" onclick="editNotice('${key}', this.getAttribute('data-text'))">এডিট</button>
                         <button class="delete-entry-btn" onclick="deleteData('notices/${currentYear}/${key}')">ডিলিট</button>
                     </div>` : '';
@@ -220,7 +220,7 @@ function loadNotices() {
                 `;
             });
         } else {
-            noticeList.innerHTML = '<p style="color:#a0a0b5; font-size:13px;">এই সালের কোনো নোটিশ নেই।</p>';
+            noticeList.innerHTML = '<p style="color:#a0a0b5; font-size:14px;">এই সালের কোনো নোটিশ নেই।</p>';
         }
     });
 }
@@ -274,7 +274,98 @@ function loadExpenses() {
 }
 
 // =========================================
-// ৬. মডাল ও ক্যাটাগরি ডেটা
+// ৬. নতুন: গ্যালারি ও পিডিএফ লোড এবং আপলোড (Max 1MB)
+// =========================================
+function uploadToGallery() {
+    const fileInput = document.getElementById('gallery-file-input');
+    const titleInput = document.getElementById('gallery-title').value.trim();
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+        alert("দয়া করে একটি ছবি বা PDF ফাইল সিলেক্ট করুন!");
+        return;
+    }
+    if (!titleInput) {
+        alert("দয়া করে ছবি বা ডকুমেন্টের একটা নাম বা বিবরণ দিন!");
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    const maxSize = 1024 * 1024; // 1 MB in Bytes (ঠিক ১ এমবি লিমিট)
+    
+    if (file.size > maxSize) {
+        alert("⚠️ ফাইল সাইজ ১ এমবি (1MB)-র চেয়ে বড়! দয়া করে 1MB-র নিচের ফাইল সিলেক্ট করুন।");
+        fileInput.value = '';
+        return;
+    }
+    
+    // ফাইলকে Base64 ডেটায় রূপান্তর করে ডেটাবেসে সেভ করা হচ্ছে
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64Data = e.target.result;
+        const dateStr = new Date().toLocaleDateString('bn-IN');
+        
+        window.dbPush(window.dbRef(window.database, `gallery/${currentYear}`), {
+            title: titleInput,
+            url: base64Data,
+            type: file.type,
+            date: dateStr
+        }).then(() => {
+            alert("ফাইল সফলভাবে গ্যালারিতে আপলোড হয়েছে!");
+            fileInput.value = '';
+            document.getElementById('gallery-title').value = '';
+        }).catch(err => {
+            alert("আপলোড ব্যর্থ হয়েছে! নেটওয়ার্ক চেক করুন।");
+            console.error(err);
+        });
+    };
+    reader.readAsDataURL(file);
+}
+
+function loadGallery() {
+    const galleryRef = window.dbRef(window.database, `gallery/${currentYear}`);
+    window.dbOnValue(galleryRef, (snapshot) => {
+        const grid = document.getElementById('gallery-grid');
+        grid.innerHTML = '';
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            Object.keys(data).reverse().forEach(key => {
+                const item = data[key];
+                let previewHtml = '';
+                
+                // ছবি হলে ইমেজ দেখাবে, PDF হলে ডাউনলোড বাটন দেখাবে
+                if (item.url && item.url.startsWith('data:image')) {
+                    previewHtml = `<img src="${item.url}" alt="${item.title}" onclick="window.open('${item.url}', '_blank')" style="cursor:pointer;" title="বড় করে দেখতে ক্লিক করুন">`;
+                } else {
+                    previewHtml = `
+                        <div class="pdf-preview-box">
+                            📄
+                            <span style="font-size:12px; color:#fff; margin-top:8px;">PDF ডকুমেন্ট</span>
+                            <a href="${item.url}" download="${item.title}.pdf" class="pdf-download-btn" style="margin-top:10px;">⬇️ ডাউনলোড করুন</a>
+                        </div>`;
+                }
+                
+                const deleteHtml = isAdmin ? `
+                    <div style="margin-top:8px;">
+                        <button class="delete-entry-btn" onclick="deleteData('gallery/${currentYear}/${key}')" style="background:#ff4757; width:80%;">🗑️ ডিলিট করুন</button>
+                    </div>` : '';
+                
+                grid.innerHTML += `
+                    <div class="gallery-card">
+                        ${previewHtml}
+                        <h4>${item.title}</h4>
+                        <p>📅 ${item.date}</p>
+                        ${deleteHtml}
+                    </div>
+                `;
+            });
+        } else {
+            grid.innerHTML = '<p style="color:#a0a0b5; font-size:14px; grid-column: 1/-1; text-align:center;">এই সালের গ্যালারিতে কোনো ছবি বা ডকুমেন্ট আপলোড করা হয়নি।</p>';
+        }
+    });
+}
+
+// =========================================
+// ৭. মডাল ও ক্যাটাগরি ডেটা
 // =========================================
 function openCategoryModal(categoryId, title) {
     currentCategory = categoryId;
@@ -308,7 +399,7 @@ function loadCategoryData() {
                 
                 const actionHtml = `
                     <td class="no-print" style="white-space: nowrap;">
-                        <button onclick="shareWhatsApp('${safeName}', '${item.amount}')" style="background:#25D366;color:white;border:none;padding:5px 8px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:5px;">💬 শেয়ার</button>
+                        <button onclick="shareWhatsApp('${safeName}', '${item.amount}')" style="background:#25D366;color:white;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px;margin-right:5px;font-weight:bold;">💬 শেয়ার</button>
                         ${editDelHtml}
                     </td>`;
                 
@@ -328,9 +419,8 @@ function loadCategoryData() {
 }
 
 // =========================================
-// ৭. ডেটা সেভ করা (Add)
+// ৮. ডেটা সেভ করা (Add)
 // =========================================
-// **এখানে নতুন নোটিশ নির্দিষ্ট সালে সেভ করার কোড আপডেট করা হয়েছে**
 function addNewNotice() {
     const text = document.getElementById('new-notice-text').value;
     if (!text) { alert("নোটিশ ফাঁকা রাখা যাবে না!"); return; }
@@ -358,7 +448,7 @@ function addCategoryDataEntry() {
 }
 
 // =========================================
-// ৮. ডেটা এডিট করা (Edit)
+// ৯. ডেটা এডিট করা (Edit)
 // =========================================
 function editNotice(key, currentText) {
     const newText = prompt("নোটিশ আপডেট করুন:", currentText);
@@ -388,7 +478,7 @@ function editCategory(key, currentName, currentAmount) {
 }
 
 // =========================================
-// ৯. ডেটা ডিলিট করা
+// ১০. ডেটা ডিলিট করা
 // =========================================
 function deleteData(path) {
     if(confirm("আপনি কি নিশ্চিত যে এই এন্ট্রিটি ডিলিট করতে চান?")) {
@@ -397,7 +487,7 @@ function deleteData(path) {
 }
 
 // =========================================
-// ১০. ভিউ কাউন্টার লজিক
+// ১১. ভিউ কাউন্টার লজিক
 // =========================================
 function setupViewCounter() {
     const viewsRef = window.dbRef(window.database, 'system/viewCount');
@@ -419,7 +509,7 @@ function setupViewCounter() {
 }
 
 // =========================================
-// ১১. লাইভ সার্চ (Live Search)
+// ১২. লাইভ সার্চ (Live Search)
 // =========================================
 function searchTable(inputId, tbodyId) {
     let input = document.getElementById(inputId).value.toLowerCase();
@@ -439,7 +529,7 @@ function searchTable(inputId, tbodyId) {
 }
 
 // =========================================
-// ১২. হোয়াটসঅ্যাপ শেয়ার (WhatsApp Share)
+// ১৩. হোয়াটসঅ্যাপ শেয়ার (WhatsApp Share)
 // =========================================
 function shareWhatsApp(name, amount) {
     const message = `নমস্কার ${name}, গ্রাম পুজো কমিটির তরফ থেকে জানানো হচ্ছে যে, আপনার দেওয়া ${amount} টাকা সফলভাবে পুজো তহবিলে জমা হয়েছে। ধন্যবাদ! 🙏`;
@@ -448,7 +538,7 @@ function shareWhatsApp(name, amount) {
 }
 
 // =========================================
-// ১৩. পিডিএফ / প্রিন্ট রিপোর্ট (PDF / Print)
+// ১৪. পিডিএফ / প্রিন্ট রিপোর্ট (PDF / Print)
 // =========================================
 function printSection(title, containerId) {
     let tableHtml = document.getElementById(containerId).innerHTML;
