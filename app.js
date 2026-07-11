@@ -9,7 +9,7 @@ let availableYears = [];
 window.onload = () => {
     setTimeout(() => {
         loadYearsFromDatabase();
-        loadClubDetails(); // ক্লাব প্রোফাইলের বিবরণ লোড হবে
+        loadClubDetails(); 
         
         if (window.onAuthStateChanged) {
             window.onAuthStateChanged(window.auth, (user) => {
@@ -93,7 +93,6 @@ function handleYearChange() {
 // =========================================
 function toggleAdminModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
 
-// পাসওয়ার্ড Show/Hide করার ফাংশন
 function togglePasswordVisibility() {
     const passInput = document.getElementById('admin-password');
     const eyeSpan = document.getElementById('toggle-password-eye');
@@ -128,7 +127,7 @@ function logoutAdmin() {
 }
 
 // =========================================
-// ৪. ক্লাব প্রোফাইল লোড এবং এডিট (নতুন ফিচার)
+// ৪. ক্লাব প্রোফাইল লোড এবং এডিট
 // =========================================
 function loadClubDetails() {
     const clubRef = window.dbRef(window.database, 'system/clubDetails');
