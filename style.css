@@ -1,6 +1,6 @@
 /* Reset & Base Setup */
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-body { background-color: #12121c; color: #e2e2ec; padding-bottom: 50px; font-size: 16px; } /* ফন্ট সাইজ বাড়ানো হয়েছে */
+body { background-color: #12121c; color: #e2e2ec; padding-bottom: 50px; font-size: 16px; }
 .hidden { display: none !important; }
 
 /* Header Area */
@@ -12,7 +12,7 @@ body { background-color: #12121c; color: #e2e2ec; padding-bottom: 50px; font-siz
 .auth-box button, .floating-edit-btn { background-color: #ff4757; color: #fff; border: none; padding: 10px 18px; font-size: 15px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
 #admin-login-btn { background-color: #ff9f43; color: #12121c; }
 
-/* Control Panel & Fund (সাইজ মিডিয়াম/নরমাল করার জন্য চওড়া বাড়ানো হয়েছে) */
+/* Control Panel & Fund */
 .main-container { max-width: 1300px; width: 95%; margin: 0 auto; padding: 0 15px; }
 .control-panel { background: #1a1a2e; border-radius: 12px; padding: 25px; margin-bottom: 25px; border: 1px solid #282846; }
 .year-selector-box { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #282846; }
@@ -50,9 +50,7 @@ body { background-color: #12121c; color: #e2e2ec; padding-bottom: 50px; font-siz
 .card-3d h3 { font-size: 18px; color: #fff; margin-bottom: 6px; }
 .card-3d p { font-size: 13px; color: #a0a0b5; }
 
-/* ========================================= */
-/* নতুন: Gallery & Document Section Styling */
-/* ========================================= */
+/* Gallery Section */
 .gallery-section { background: #1a1a2e; border-radius: 12px; padding: 25px; margin-bottom: 30px; border: 1px solid #282846; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 .gallery-section h3 { font-size: 20px; color: #2ed573; margin-bottom: 15px; border-bottom: 1px solid #282846; padding-bottom: 10px; }
 .gallery-upload-box { background: #22223b; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #ff9f43; }
@@ -99,6 +97,12 @@ tbody tr:nth-child(even) { background-color: #1c1c32; }
 .auth-buttons button { width: 48%; padding: 10px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; }
 .login-submit-btn { background: #2ed573; color: #fff; margin-right: 2%; }
 .login-cancel-btn { background: #4b4b61; color: #fff; }
+
+/* নতুন: Full-Screen Image Viewer */
+.image-viewer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+.image-viewer-content { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.8); border: 2px solid #ff9f43; }
+.image-close-btn { position: absolute; top: 20px; right: 30px; font-size: 45px; color: white; cursor: pointer; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+.image-close-btn:hover { color: #ff4757; }
 
 /* Mobile Responsive Fixes (মোবাইল ভিউ) */
 @media screen and (max-width: 768px) {
