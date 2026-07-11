@@ -9,6 +9,7 @@ let availableYears = [];
 window.onload = () => {
     setTimeout(() => {
         loadYearsFromDatabase();
+        loadClubDetails(); // ক্লাব প্রোফাইলের বিবরণ লোড হবে
         
         if (window.onAuthStateChanged) {
             window.onAuthStateChanged(window.auth, (user) => {
@@ -88,9 +89,22 @@ function handleYearChange() {
 }
 
 // =========================================
-// ৩. অ্যাডমিন লগইন / লগআউট কন্ট্রোল
+// ৩. অ্যাডমিন লগইন / লগআউট কন্ট্রোল উইথ Eye Toggle
 // =========================================
 function toggleAdminModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
+
+// পাসওয়ার্ড Show/Hide করার ফাংশন
+function togglePasswordVisibility() {
+    const passInput = document.getElementById('admin-password');
+    const eyeSpan = document.getElementById('toggle-password-eye');
+    if (passInput.type === 'password') {
+        passInput.type = 'text';
+        eyeSpan.innerText = '🙈';
+    } else {
+        passInput.type = 'password';
+        eyeSpan.innerText = '👁️';
+    }
+}
 
 function submitAdminLogin() {
     const email = document.getElementById('admin-email').value.trim(); 
@@ -114,7 +128,65 @@ function logoutAdmin() {
 }
 
 // =========================================
-// ৪. ডেটা লোড করা 
+// ৪. ক্লাব প্রোফাইল লোড এবং এডিট (নতুন ফিচার)
+// =========================================
+function loadClubDetails() {
+    const clubRef = window.dbRef(window.database, 'system/clubDetails');
+    window.dbOnValue(clubRef, (snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            document.getElementById('display-club-name').innerText = data.name || "🪔 আমাদের গ্রাম্য পুজো কমিটি";
+            document.getElementById('display-club-address').innerText = "📍 গ্রাম + পোস্ট: " + (data.address || "বাগনান, উলুবেড়িয়া, হাওড়া");
+            
+            let contactText = "";
+            if (data.mobile) contactText += `📞 মোবাইল: ${data.mobile} `;
+            if (data.date) contactText += `| 📅 পুজোর তারিখ: ${data.date}`;
+            if (!contactText) contactText = "📞 মোবাইল ও তারিখ অ্যাডমিন প্যানেল থেকে যোগ করুন";
+            
+            document.getElementById('display-club-contact').innerText = contactText;
+        } else {
+            document.getElementById('display-club-contact').innerText = "📞 মোবাইল ও তারিখ অ্যাডমিন প্যানেল থেকে যোগ করুন";
+        }
+    });
+}
+
+function openClubEditModal() {
+    const clubRef = window.dbRef(window.database, 'system/clubDetails');
+    window.dbOnValue(clubRef, (snapshot) => {
+        const data = snapshot.exists() ? snapshot.val() : {};
+        document.getElementById('edit-club-name').value = data.name || "🪔 আমাদের গ্রাম্য পুজো কমিটি";
+        document.getElementById('edit-club-address').value = data.address || "বাগনান, উলুবেড়িয়া, হাওড়া";
+        document.getElementById('edit-club-mobile').value = data.mobile || "";
+        document.getElementById('edit-club-date').value = data.date || "";
+        document.getElementById('club-edit-modal').classList.remove('hidden');
+    }, { onlyOnce: true });
+}
+
+function closeClubEditModal() {
+    document.getElementById('club-edit-modal').classList.add('hidden');
+}
+
+function saveClubDetails() {
+    const name = document.getElementById('edit-club-name').value.trim();
+    const address = document.getElementById('edit-club-address').value.trim();
+    const mobile = document.getElementById('edit-club-mobile').value.trim();
+    const date = document.getElementById('edit-club-date').value.trim();
+
+    if (!name) { alert("ক্লাবের নাম ফাঁকা রাখা যাবে না!"); return; }
+
+    window.dbSet(window.dbRef(window.database, 'system/clubDetails'), {
+        name: name,
+        address: address,
+        mobile: mobile,
+        date: date
+    }).then(() => {
+        alert("ক্লাবের বিবরণ সফলভাবে আপডেট হয়েছে!");
+        closeClubEditModal();
+    });
+}
+
+// =========================================
+// ৫. ডেটা লোড করা (Notices, Funds, Expenses)
 // =========================================
 function loadAllData() {
     loadNotices();
@@ -202,13 +274,12 @@ function loadExpenses() {
 }
 
 // =========================================
-// ৫. মডাল ও ক্যাটাগরি ডেটা (উইথ হোয়াটসঅ্যাপ শেয়ার)
+// ৬. মডাল ও ক্যাটাগরি ডেটা (উইথ হোয়াটসঅ্যাপ শেয়ার)
 // =========================================
 function openCategoryModal(categoryId, title) {
     currentCategory = categoryId;
     document.getElementById('modal-title').innerText = title;
     document.getElementById('data-modal').classList.remove('hidden');
-    // মডাল খোলার সময় সার্চ বক্স ফাঁকা করা
     document.getElementById('search-modal').value = '';
     loadCategoryData();
 }
@@ -235,7 +306,6 @@ function loadCategoryData() {
                     <button class="delete-entry-btn" onclick="deleteData('funds/${currentYear}/${currentCategory}/${key}')">ডিলিট</button>
                 ` : '';
                 
-                // শেয়ার বাটন সবার জন্য, এডিট/ডিলিট অ্যাডমিনের জন্য
                 const actionHtml = `
                     <td class="no-print" style="white-space: nowrap;">
                         <button onclick="shareWhatsApp('${safeName}', '${item.amount}')" style="background:#25D366;color:white;border:none;padding:5px 8px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:5px;">💬 শেয়ার</button>
@@ -258,7 +328,7 @@ function loadCategoryData() {
 }
 
 // =========================================
-// ৬. ডেটা সেভ করা (Add)
+// ৭. ডেটা সেভ করা (Add)
 // =========================================
 function addNewNotice() {
     const text = document.getElementById('new-notice-text').value;
@@ -287,7 +357,7 @@ function addCategoryDataEntry() {
 }
 
 // =========================================
-// ৭. ডেটা এডিট করা (Edit)
+// ৮. ডেটা এডিট করা (Edit)
 // =========================================
 function editNotice(key, currentText) {
     const newText = prompt("নোটিশ আপডেট করুন:", currentText);
@@ -317,7 +387,7 @@ function editCategory(key, currentName, currentAmount) {
 }
 
 // =========================================
-// ৮. ডেটা ডিলিট করা
+// ৯. ডেটা ডিলিট করা
 // =========================================
 function deleteData(path) {
     if(confirm("আপনি কি নিশ্চিত যে এই এন্ট্রিটি ডিলিট করতে চান?")) {
@@ -326,7 +396,7 @@ function deleteData(path) {
 }
 
 // =========================================
-// ৯. ভিউ কাউন্টার লজিক
+// ১০. ভিউ কাউন্টার লজিক
 // =========================================
 function setupViewCounter() {
     const viewsRef = window.dbRef(window.database, 'system/viewCount');
@@ -348,14 +418,13 @@ function setupViewCounter() {
 }
 
 // =========================================
-// ১০. লাইভ সার্চ (Live Search)
+// ১১. লাইভ সার্চ (Live Search)
 // =========================================
 function searchTable(inputId, tbodyId) {
     let input = document.getElementById(inputId).value.toLowerCase();
     let rows = document.getElementById(tbodyId).getElementsByTagName('tr');
     
     for (let i = 0; i < rows.length; i++) {
-        // শুধুমাত্র "নাম/বিবরণ" কলাম (index 1) এ সার্চ করা হচ্ছে
         let text = rows[i].getElementsByTagName('td')[1];
         if (text) {
             let textValue = text.innerText.toLowerCase();
@@ -369,7 +438,7 @@ function searchTable(inputId, tbodyId) {
 }
 
 // =========================================
-// ১১. হোয়াটসঅ্যাপ শেয়ার (WhatsApp Share)
+// ১২. হোয়াটসঅ্যাপ শেয়ার (WhatsApp Share)
 // =========================================
 function shareWhatsApp(name, amount) {
     const message = `নমস্কার ${name}, গ্রাম পুজো কমিটির তরফ থেকে জানানো হচ্ছে যে, আপনার দেওয়া ${amount} টাকা সফলভাবে পুজো তহবিলে জমা হয়েছে। ধন্যবাদ! 🙏`;
@@ -378,14 +447,13 @@ function shareWhatsApp(name, amount) {
 }
 
 // =========================================
-// ১২. পিডিএফ / প্রিন্ট রিপোর্ট (PDF / Print)
+// ১৩. পিডিএফ / প্রিন্ট রিপোর্ট (PDF / Print)
 // =========================================
 function printSection(title, containerId) {
     let tableHtml = document.getElementById(containerId).innerHTML;
     let printWindow = window.open('', '', 'height=600,width=800');
     
     printWindow.document.write('<html><head><title>' + title + ' রিপোর্ট</title>');
-    // প্রিন্ট পেজের জন্য আলাদা ডিজাইন দেওয়া হলো, যেখানে অ্যাকশন বাটনগুলো হাইড করা থাকবে
     printWindow.document.write(`
         <style>
             body { font-family: sans-serif; padding: 20px; color: black; }
@@ -393,7 +461,7 @@ function printSection(title, containerId) {
             table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
             th, td { border: 1px solid #333; padding: 10px; text-align: left; }
             th { background-color: #f2f2f2; color: black; font-weight: bold; }
-            .no-print { display: none !important; } /* অ্যাকশন কলাম হাইড করার জন্য */
+            .no-print { display: none !important; }
             .hidden { display: none !important; }
         </style>
     `);
@@ -404,7 +472,6 @@ function printSection(title, containerId) {
     
     printWindow.document.close();
     
-    // পেজটা রেডি হতে একটু সময় দিয়ে প্রিন্ট ডায়লগ ওপেন করা
     setTimeout(() => {
         printWindow.print();
     }, 500);
