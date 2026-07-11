@@ -191,7 +191,7 @@ function loadAllData() {
     loadNotices();
     loadFinancialData();
     loadExpenses();
-    loadGallery(); // নতুন: গ্যালারি লোড হবে
+    loadGallery(); 
     if (currentCategory) loadCategoryData(); 
 }
 
@@ -274,7 +274,7 @@ function loadExpenses() {
 }
 
 // =========================================
-// ৬. নতুন: গ্যালারি ও পিডিএফ লোড এবং আপলোড (Max 1MB)
+// ৬. গ্যালারি ও পিডিএফ লোড এবং আপলোড (Max 1MB)
 // =========================================
 function uploadToGallery() {
     const fileInput = document.getElementById('gallery-file-input');
@@ -290,7 +290,7 @@ function uploadToGallery() {
     }
     
     const file = fileInput.files[0];
-    const maxSize = 1024 * 1024; // 1 MB in Bytes (ঠিক ১ এমবি লিমিট)
+    const maxSize = 1024 * 1024; // 1 MB limit
     
     if (file.size > maxSize) {
         alert("⚠️ ফাইল সাইজ ১ এমবি (1MB)-র চেয়ে বড়! দয়া করে 1MB-র নিচের ফাইল সিলেক্ট করুন।");
@@ -298,7 +298,6 @@ function uploadToGallery() {
         return;
     }
     
-    // ফাইলকে Base64 ডেটায় রূপান্তর করে ডেটাবেসে সেভ করা হচ্ছে
     const reader = new FileReader();
     reader.onload = function(e) {
         const base64Data = e.target.result;
@@ -321,6 +320,17 @@ function uploadToGallery() {
     reader.readAsDataURL(file);
 }
 
+// **নতুন: ফুল-স্ক্রিন ইমেজ ভিউয়ার লজিক**
+window.openImageViewer = function(url) {
+    document.getElementById('full-size-image').src = url;
+    document.getElementById('image-viewer-modal').classList.remove('hidden');
+}
+
+window.closeImageViewer = function() {
+    document.getElementById('image-viewer-modal').classList.add('hidden');
+    document.getElementById('full-size-image').src = '';
+}
+
 function loadGallery() {
     const galleryRef = window.dbRef(window.database, `gallery/${currentYear}`);
     window.dbOnValue(galleryRef, (snapshot) => {
@@ -332,9 +342,9 @@ function loadGallery() {
                 const item = data[key];
                 let previewHtml = '';
                 
-                // ছবি হলে ইমেজ দেখাবে, PDF হলে ডাউনলোড বাটন দেখাবে
+                // ছবি হলে ইন-অ্যাপ ভিউয়ারে খুলবে, PDF হলে ডাউনলোড বাটন দেখাবে
                 if (item.url && item.url.startsWith('data:image')) {
-                    previewHtml = `<img src="${item.url}" alt="${item.title}" onclick="window.open('${item.url}', '_blank')" style="cursor:pointer;" title="বড় করে দেখতে ক্লিক করুন">`;
+                    previewHtml = `<img src="${item.url}" alt="${item.title}" onclick="openImageViewer('${item.url}')" style="cursor:pointer;" title="বড় করে দেখতে ক্লিক করুন">`;
                 } else {
                     previewHtml = `
                         <div class="pdf-preview-box">
@@ -423,7 +433,7 @@ function loadCategoryData() {
 // =========================================
 function addNewNotice() {
     const text = document.getElementById('new-notice-text').value;
-    if (!text) { alert("নোটিশ ফাঁকা রাখা যাবে না!"); return; }
+    if (!text) { alert("নোটিশ ফাঁকা রাখা যাবে নিচে!"); return; }
     const dateStr = new Date().toLocaleDateString('bn-IN');
     window.dbPush(window.dbRef(window.database, `notices/${currentYear}`), { text: text, date: dateStr })
         .then(() => document.getElementById('new-notice-text').value = '');
