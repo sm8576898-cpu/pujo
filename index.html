@@ -95,12 +95,11 @@
         </section>
 
         <!-- ========================================= -->
-        <!-- নতুন: Gallery & Document Section (Max 1MB) -->
+        <!-- Gallery & Document Section (Max 1MB) -->
         <!-- ========================================= -->
         <section class="gallery-section">
             <h3>🖼️ পুজো গ্যালারি ও ডকুমেন্ট (ছবি / PDF) <span class="live-badge" style="background:#2ed573;">লাইভ</span></h3>
             
-            <!-- অ্যাডমিন আপলোড বক্স (সর্বোচ্চ 1MB) -->
             <div class="admin-only hidden gallery-upload-box">
                 <h4 style="color:#ff9f43; margin-bottom:10px;">📤 নতুন ছবি বা PDF আপলোড করুন (সর্বোচ্চ ১ এমবি / 1MB)</h4>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
@@ -111,7 +110,6 @@
                 <p style="color:#ff4757; font-size:12px; margin-top:8px;">* সতর্কবার্তা: ফাইল সাইজ কোনোভাবেই 1MB-র বেশি হওয়া যাবে না।</p>
             </div>
 
-            <!-- গ্যালারি গ্রিড (যেখানে ছবি ও PDF লোড হবে) -->
             <div id="gallery-grid" class="gallery-grid">
                 <!-- ডায়নামিক ছবি ও ডকুমেন্ট এখানে লোড হবে -->
             </div>
@@ -239,6 +237,12 @@
                 <button class="login-cancel-btn" onclick="toggleAdminModal()" style="width: 50%; background: #ff4757;">❌ বন্ধ করুন</button>
             </div>
         </div>
+    </div>
+
+    <!-- নতুন: Full Screen Image Viewer Modal -->
+    <div id="image-viewer-modal" class="image-viewer-overlay hidden">
+        <span class="image-close-btn" onclick="closeImageViewer()">&times;</span>
+        <img id="full-size-image" class="image-viewer-content" src="" alt="Full size image">
     </div>
 
     <!-- ফায়ারবেস (Firebase) কানেকশন স্ক্রিপ্ট -->
