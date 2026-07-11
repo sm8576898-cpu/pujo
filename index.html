@@ -21,6 +21,7 @@
             <h1 id="display-club-name">🪔 আমাদের গ্রাম্য পুজো কমিটি</h1>
             <p id="display-club-address">📍 গ্রাম + পোস্ট: বাগনান, উলুবেড়িয়া, হাওড়া</p>
             <p id="display-club-contact" style="color: #ffd700; font-size: 14px; margin-top: 5px; font-weight: bold;">📞 মোবাইল: লোড হচ্ছে... | 📅 পুজোর তারিখ: লোড হচ্ছে...</p>
+            <p id="display-club-members" style="color: #2ed573; font-size: 13px; margin-top: 5px; font-weight: bold;">👥 কমিটি / মূল সদস্য: লোড হচ্ছে...</p>
             
             <button class="admin-only hidden no-print" onclick="openClubEditModal()" style="margin-top: 12px; background: #ffd700; color: #12121c; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">⚙️ ক্লাব প্রোফাইল ও তারিখ এডিট করুন</button>
         </div>
@@ -70,7 +71,7 @@
             </div>
         </section>
 
-        <!-- 3D Style Main Function Cards (অটো-সাম ফিচার যুক্ত করা হয়েছে) -->
+        <!-- 3D Style Main Function Cards -->
         <section class="cards-grid-container">
             <div class="card-3d" onclick="openCategoryModal('mukto_haste', '🎁 মুক্ত হস্তে দান')">
                 <div class="card-icon">🎁</div>
@@ -199,7 +200,7 @@
 
     <!-- Club Profile Edit Modal -->
     <div id="club-edit-modal" class="modal-overlay hidden">
-        <div class="auth-modal-content" style="width: 90%; max-width: 420px; text-align: left;">
+        <div class="auth-modal-content" style="width: 90%; max-width: 450px; text-align: left;">
             <h3 style="text-align: center; border-bottom: 1px solid #3d3d5c; padding-bottom: 10px;">⚙️ ক্লাব প্রোফাইল ও তারিখ এডিট</h3>
             <div style="margin-top: 15px;">
                 <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">🪔 ক্লাবের নাম:</label>
@@ -212,7 +213,11 @@
                 <input type="text" id="edit-club-mobile" placeholder="যেমন: 9876543210 / 8765432109" style="margin-top: 5px; margin-bottom: 12px; text-align: left; letter-spacing: normal;">
                 
                 <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">📅 পুজোর তারিখ / দিনক্ষণ:</label>
-                <input type="text" id="edit-club-date" placeholder="যেমন: ২০ - ২৪ অক্টোবর ২০২৬ (ষষ্ঠী থেকে দশমী)" style="margin-top: 5px; margin-bottom: 15px; text-align: left; letter-spacing: normal;">
+                <input type="text" id="edit-club-date" placeholder="যেমন: ২০ - ২৪ অক্টোবর ২০২৬ (ষষ্ঠী থেকে দশমী)" style="margin-top: 5px; margin-bottom: 12px; text-align: left; letter-spacing: normal;">
+
+                <!-- নতুন: সদস্যদের নাম লেখার ঘর -->
+                <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">👥 কমিটি / মূল সদস্যদের নাম:</label>
+                <input type="text" id="edit-club-members" placeholder="যেমন: সভাপতি: রাহুল, সম্পাদক: বিকাশ, কোষাধ্যক্ষ: সায়ন্তন" style="margin-top: 5px; margin-bottom: 15px; text-align: left; letter-spacing: normal;">
             </div>
             
             <div class="auth-buttons" style="display: flex; gap: 10px;">
