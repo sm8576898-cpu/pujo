@@ -225,20 +225,46 @@ function loadNotices() {
     });
 }
 
+// **এখানে কার্ডের অটো-সাম ফিচার যোগ করা হয়েছে**
 function loadFinancialData() {
     const yearRef = window.dbRef(window.database, `funds/${currentYear}`);
     window.dbOnValue(yearRef, (snapshot) => {
         let totalIncome = 0; let totalExpense = 0;
+        
+        // ৪টে কার্ডের আলাদা হিসাব রাখার জন্য
+        let categoryTotals = {
+            'mukto_haste': 0,
+            'guest_card': 0,
+            'matha_pichu': 0,
+            'adhai': 0
+        };
+
         if (snapshot.exists()) {
             const data = snapshot.val();
             ['mukto_haste', 'guest_card', 'matha_pichu', 'adhai'].forEach(cat => {
-                if (data[cat]) Object.values(data[cat]).forEach(item => totalIncome += Number(item.amount || 0));
+                if (data[cat]) {
+                    Object.values(data[cat]).forEach(item => {
+                        let amount = Number(item.amount || 0);
+                        totalIncome += amount;
+                        categoryTotals[cat] += amount; // কার্ডের জন্য আলাদা করে যোগ করা হচ্ছে
+                    });
+                }
             });
             if (data.expenses) Object.values(data.expenses).forEach(item => totalExpense += Number(item.amount || 0));
         }
+        
+        // মূল তহবিলের ডাটা আপডেট
         document.getElementById('total-income').innerText = `₹${totalIncome.toFixed(2)}`;
         document.getElementById('total-expense').innerText = `₹${totalExpense.toFixed(2)}`;
         document.getElementById('net-balance').innerText = `₹${(totalIncome - totalExpense).toFixed(2)}`;
+        
+        // ৪টে কার্ডের গায়ে সরাসরি অ্যামাউন্ট আপডেট
+        ['mukto_haste', 'guest_card', 'matha_pichu', 'adhai'].forEach(cat => {
+            const sumElement = document.getElementById(`sum-${cat}`);
+            if (sumElement) {
+                sumElement.innerText = `মোট জমা: ₹${categoryTotals[cat].toFixed(2)}`;
+            }
+        });
     });
 }
 
@@ -320,7 +346,6 @@ function uploadToGallery() {
     reader.readAsDataURL(file);
 }
 
-// **নতুন: ফুল-স্ক্রিন ইমেজ ভিউয়ার লজিক**
 window.openImageViewer = function(url) {
     document.getElementById('full-size-image').src = url;
     document.getElementById('image-viewer-modal').classList.remove('hidden');
@@ -342,7 +367,6 @@ function loadGallery() {
                 const item = data[key];
                 let previewHtml = '';
                 
-                // ছবি হলে ইন-অ্যাপ ভিউয়ারে খুলবে, PDF হলে ডাউনলোড বাটন দেখাবে
                 if (item.url && item.url.startsWith('data:image')) {
                     previewHtml = `<img src="${item.url}" alt="${item.title}" onclick="openImageViewer('${item.url}')" style="cursor:pointer;" title="বড় করে দেখতে ক্লিক করুন">`;
                 } else {
