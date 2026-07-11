@@ -30,7 +30,7 @@
         </div>
     </header>
 
-    <!-- Main Container (চওড়া ও মিডিয়াম সাইজ) -->
+    <!-- Main Container -->
     <main class="main-container">
         <section class="control-panel">
             <div class="year-selector-box" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
@@ -70,33 +70,35 @@
             </div>
         </section>
 
-        <!-- 3D Style Main Function Cards -->
+        <!-- 3D Style Main Function Cards (অটো-সাম ফিচার যুক্ত করা হয়েছে) -->
         <section class="cards-grid-container">
             <div class="card-3d" onclick="openCategoryModal('mukto_haste', '🎁 মুক্ত হস্তে দান')">
                 <div class="card-icon">🎁</div>
                 <h3>মুক্ত হস্তে দান</h3>
                 <p>তালিকা ও মোট জমার হিসাব</p>
+                <div id="sum-mukto_haste" style="color: #2ed573; font-weight: bold; font-size: 15px; margin-top: 10px; border-top: 1px solid #282846; padding-top: 10px;">মোট জমা: ₹০.০০</div>
             </div>
             <div class="card-3d" onclick="openCategoryModal('guest_card', '🎟️ গেস্ট কার্ড বিতরণ')">
                 <div class="card-icon">🎟️</div>
                 <h3>গেস্ট কার্ড বিতরণ</h3>
                 <p>অতিথিদের বিশেষ কার্ডের হিসাব</p>
+                <div id="sum-guest_card" style="color: #2ed573; font-weight: bold; font-size: 15px; margin-top: 10px; border-top: 1px solid #282846; padding-top: 10px;">মোট জমা: ₹০.০০</div>
             </div>
             <div class="card-3d" onclick="openCategoryModal('matha_pichu', '👥 মাথা পিছু চাঁদা')">
                 <div class="card-icon">👥</div>
                 <h3>মাথা পিছু চাঁদা</h3>
                 <p>গ্রামের নিজস্ব চাঁদা সংগ্রহ</p>
+                <div id="sum-matha_pichu" style="color: #2ed573; font-weight: bold; font-size: 15px; margin-top: 10px; border-top: 1px solid #282846; padding-top: 10px;">মোট জমা: ₹০.০০</div>
             </div>
             <div class="card-3d" onclick="openCategoryModal('adhai', '🛍️ আদায় (অন্যান্য)')">
                 <div class="card-icon">🛍️</div>
                 <h3>আদায় (অন্যান্য)</h3>
                 <p>বিজ্ঞাপন ও বিবিধ সংগ্রহ</p>
+                <div id="sum-adhai" style="color: #2ed573; font-weight: bold; font-size: 15px; margin-top: 10px; border-top: 1px solid #282846; padding-top: 10px;">মোট জমা: ₹০.০০</div>
             </div>
         </section>
 
-        <!-- ========================================= -->
         <!-- Gallery & Document Section (Max 1MB) -->
-        <!-- ========================================= -->
         <section class="gallery-section">
             <h3>🖼️ পুজো গ্যালারি ও ডকুমেন্ট (ছবি / PDF) <span class="live-badge" style="background:#2ed573;">লাইভ</span></h3>
             
@@ -239,7 +241,7 @@
         </div>
     </div>
 
-    <!-- নতুন: Full Screen Image Viewer Modal -->
+    <!-- Full Screen Image Viewer Modal -->
     <div id="image-viewer-modal" class="image-viewer-overlay hidden">
         <span class="image-close-btn" onclick="closeImageViewer()">&times;</span>
         <img id="full-size-image" class="image-viewer-content" src="" alt="Full size image">
