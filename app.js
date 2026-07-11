@@ -127,7 +127,7 @@ function logoutAdmin() {
 }
 
 // =========================================
-// ৪. ক্লাব প্রোফাইল লোড এবং এডিট
+// ৪. ক্লাব প্রোফাইল লোড এবং এডিট (সদস্যদের নাম সহ)
 // =========================================
 function loadClubDetails() {
     const clubRef = window.dbRef(window.database, 'system/clubDetails');
@@ -143,8 +143,16 @@ function loadClubDetails() {
             if (!contactText) contactText = "📞 মোবাইল ও তারিখ অ্যাডমিন প্যানেল থেকে যোগ করুন";
             
             document.getElementById('display-club-contact').innerText = contactText;
+
+            // নতুন: সদস্যদের নাম লোড করা
+            if (data.members) {
+                document.getElementById('display-club-members').innerText = "👥 কমিটি / মূল সদস্য: " + data.members;
+            } else {
+                document.getElementById('display-club-members').innerText = "👥 কমিটি / মূল সদস্য: অ্যাডমিন প্যানেল থেকে নাম যোগ করুন";
+            }
         } else {
             document.getElementById('display-club-contact').innerText = "📞 মোবাইল ও তারিখ অ্যাডমিন প্যানেল থেকে যোগ করুন";
+            document.getElementById('display-club-members').innerText = "👥 কমিটি / মূল সদস্য: অ্যাডমিন প্যানেল থেকে নাম যোগ করুন";
         }
     });
 }
@@ -157,6 +165,7 @@ function openClubEditModal() {
         document.getElementById('edit-club-address').value = data.address || "বাগনান, উলুবেড়িয়া, হাওড়া";
         document.getElementById('edit-club-mobile').value = data.mobile || "";
         document.getElementById('edit-club-date').value = data.date || "";
+        document.getElementById('edit-club-members').value = data.members || ""; // সদস্যদের নাম ইনপুটে বসবে
         document.getElementById('club-edit-modal').classList.remove('hidden');
     }, { onlyOnce: true });
 }
@@ -170,6 +179,7 @@ function saveClubDetails() {
     const address = document.getElementById('edit-club-address').value.trim();
     const mobile = document.getElementById('edit-club-mobile').value.trim();
     const date = document.getElementById('edit-club-date').value.trim();
+    const members = document.getElementById('edit-club-members').value.trim(); // সদস্যদের নাম নেওয়া হলো
 
     if (!name) { alert("ক্লাবের নাম ফাঁকা রাখা যাবে না!"); return; }
 
@@ -177,7 +187,8 @@ function saveClubDetails() {
         name: name,
         address: address,
         mobile: mobile,
-        date: date
+        date: date,
+        members: members
     }).then(() => {
         alert("ক্লাবের বিবরণ সফলভাবে আপডেট হয়েছে!");
         closeClubEditModal();
@@ -225,13 +236,11 @@ function loadNotices() {
     });
 }
 
-// **এখানে কার্ডের অটো-সাম ফিচার যোগ করা হয়েছে**
 function loadFinancialData() {
     const yearRef = window.dbRef(window.database, `funds/${currentYear}`);
     window.dbOnValue(yearRef, (snapshot) => {
         let totalIncome = 0; let totalExpense = 0;
         
-        // ৪টে কার্ডের আলাদা হিসাব রাখার জন্য
         let categoryTotals = {
             'mukto_haste': 0,
             'guest_card': 0,
@@ -246,19 +255,17 @@ function loadFinancialData() {
                     Object.values(data[cat]).forEach(item => {
                         let amount = Number(item.amount || 0);
                         totalIncome += amount;
-                        categoryTotals[cat] += amount; // কার্ডের জন্য আলাদা করে যোগ করা হচ্ছে
+                        categoryTotals[cat] += amount;
                     });
                 }
             });
             if (data.expenses) Object.values(data.expenses).forEach(item => totalExpense += Number(item.amount || 0));
         }
         
-        // মূল তহবিলের ডাটা আপডেট
         document.getElementById('total-income').innerText = `₹${totalIncome.toFixed(2)}`;
         document.getElementById('total-expense').innerText = `₹${totalExpense.toFixed(2)}`;
         document.getElementById('net-balance').innerText = `₹${(totalIncome - totalExpense).toFixed(2)}`;
         
-        // ৪টে কার্ডের গায়ে সরাসরি অ্যামাউন্ট আপডেট
         ['mukto_haste', 'guest_card', 'matha_pichu', 'adhai'].forEach(cat => {
             const sumElement = document.getElementById(`sum-${cat}`);
             if (sumElement) {
