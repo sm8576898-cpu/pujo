@@ -38,11 +38,11 @@ window.onload = () => {
 // =========================================
 function formatDateForDisplay(dateStr) {
     if (!dateStr) return "";
-    if (dateStr.includes('/')) return dateStr; // যদি আগে থেকেই ঠিক থাকে
+    if (dateStr.includes('/')) return dateStr; 
     if (dateStr.includes('-')) {
         const parts = dateStr.split('-');
         if (parts.length === 3) {
-            return `${parts[2]}/${parts[1]}/${parts[0]}`; // YYYY-MM-DD থেকে DD/MM/YYYY
+            return `${parts[2]}/${parts[1]}/${parts[0]}`; 
         }
     }
     return dateStr;
@@ -267,7 +267,7 @@ function saveClubDetails() {
 }
 
 // =========================================
-// ৬. ডেটা লোড করা (সব জায়গায় Display Formatter বসানো হয়েছে)
+// ৬. ডেটা লোড করা 
 // =========================================
 function loadAllData() {
     loadPujaDate(); 
@@ -371,7 +371,7 @@ function loadExpenses() {
 }
 
 // =========================================
-// ৭. গ্যালারি ও পিডিএফ লোড এবং আপলোড
+// ৭. গ্যালারি ও পিডিএফ লোড এবং অটো-কম্প্রেশন আপলোড ম্যাজিক
 // =========================================
 function uploadToGallery() {
     const fileInput = document.getElementById('gallery-file-input');
@@ -381,7 +381,7 @@ function uploadToGallery() {
     if (!titleInput) { alert("দয়া করে ছবি বা ডকুমেন্টের একটা নাম বা বিবরণ দিন!"); return; }
     
     const file = fileInput.files[0];
-    const maxSize = 1024 * 1024; 
+    const maxSize = 1024 * 1024; // 1 MB input limit
     
     if (file.size > maxSize) {
         alert("⚠️ ফাইল সাইজ ১ এমবি (1MB)-র চেয়ে বড়! দয়া করে 1MB-র নিচের ফাইল সিলেক্ট করুন।");
@@ -389,23 +389,65 @@ function uploadToGallery() {
         return;
     }
     
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const base64Data = e.target.result;
-        const dateStr = getFormattedDate(); // DD/MM/YYYY
-        
-        window.dbPush(window.dbRef(window.database, `gallery/${currentYear}`), {
-            title: titleInput,
-            url: base64Data,
-            type: file.type,
-            date: dateStr
-        }).then(() => {
-            alert("ফাইল সফলভাবে গ্যালারিতে আপলোড হয়েছে!");
-            fileInput.value = '';
-            document.getElementById('gallery-title').value = '';
-        }).catch(err => { alert("আপলোড ব্যর্থ হয়েছে! নেটওয়ার্ক চেক করুন।"); });
-    };
-    reader.readAsDataURL(file);
+    const dateStr = getFormattedDate(); 
+
+    // PDF হলে কম্প্রেশন ছাড়াই সরাসরি আপলোড হবে
+    if (file.type === "application/pdf") {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64Data = e.target.result;
+            saveToFirebaseGallery(titleInput, base64Data, file.type, dateStr, fileInput);
+        };
+        reader.readAsDataURL(file);
+    } 
+    // ছবি হলে অটোমেটিক্যালি ছোট (Compress) করে তারপর আপলোড হবে
+    else if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement("canvas");
+                const MAX_WIDTH = 800; // ছবিটা রিসাইজ হয়ে ৮০০ পিক্সেলের বেশি চওড়া হবে না
+                const MAX_HEIGHT = 800;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                } else {
+                    if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // ছবিটাকে JPEG ফরম্যাটে ৬০% কোয়ালিটিতে কনভার্ট করা হচ্ছে (সাইজ একদম ছোট হয়ে যাবে)
+                const compressedBase64 = canvas.toDataURL("image/jpeg", 0.6);
+                saveToFirebaseGallery(titleInput, compressedBase64, "image/jpeg", dateStr, fileInput);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        alert("দয়া করে শুধুমাত্র ছবি (Image) বা পিডিএফ (PDF) আপলোড করুন!");
+        fileInput.value = '';
+    }
+}
+
+// ফায়ারবেসে ডেটা পাঠানোর হেল্পার ফাংশন
+function saveToFirebaseGallery(title, dataUrl, type, dateStr, fileInput) {
+    window.dbPush(window.dbRef(window.database, `gallery/${currentYear}`), {
+        title: title,
+        url: dataUrl,
+        type: type,
+        date: dateStr
+    }).then(() => {
+        alert("ফাইল সফলভাবে গ্যালারিতে আপলোড হয়েছে!");
+        fileInput.value = '';
+        document.getElementById('gallery-title').value = '';
+    }).catch(err => { alert("আপলোড ব্যর্থ হয়েছে! নেটওয়ার্ক চেক করুন।"); });
 }
 
 window.openImageViewer = function(url) {
