@@ -34,7 +34,7 @@ window.onload = () => {
 };
 
 // =========================================
-// ২. বছর বা সাল কন্ট্রোল
+// ২. বছর বা সাল কন্ট্রোল (নতুন ডিলিট অপশন সহ)
 // =========================================
 function loadYearsFromDatabase() {
     const yearsRef = window.dbRef(window.database, 'system/years');
@@ -83,6 +83,33 @@ function openAddYearPrompt() {
     }
 }
 
+// **নতুন: ভুল সাল ডিলিট করার ফাংশন**
+window.deleteYearPrompt = function() {
+    const yearToDelete = prompt("আপনি কোন সালটি ডিলিট করতে চান? (যেমন: 3000):");
+    if (yearToDelete) {
+        const yearStr = yearToDelete.trim();
+        if (availableYears.includes(yearStr)) {
+            if (availableYears.length === 1) {
+                alert("কমপক্ষে একটি সাল সিস্টেমে রাখতেই হবে! আপনি এটি ডিলিট করতে পারবেন না।");
+                return;
+            }
+            if (confirm(`আপনি কি নিশ্চিত যে আপনি ${yearStr} সালটি লিস্ট থেকে মুছে ফেলতে চান?`)) {
+                availableYears = availableYears.filter(y => y !== yearStr);
+                window.dbSet(window.dbRef(window.database, 'system/years'), availableYears).then(() => {
+                    if (currentYear === yearStr) {
+                        currentYear = availableYears[0]; // ডিলিট হওয়া সাল সিলেক্ট থাকলে অন্য সালে শিফট করবে
+                    }
+                    renderYearSelector();
+                    loadAllData();
+                    alert(`${yearStr} সাল সফলভাবে ডিলিট করা হয়েছে!`);
+                });
+            }
+        } else {
+            alert("এই সালটি ড্রপডাউন লিস্টে খুঁজে পাওয়া যায়নি!");
+        }
+    }
+}
+
 function handleYearChange() {
     currentYear = document.getElementById('year-select').value;
     loadAllData(); 
@@ -127,7 +154,7 @@ function logoutAdmin() {
 }
 
 // =========================================
-// ৪. ক্লাব প্রোফাইল লোড এবং এডিট (সদস্যদের নাম সহ)
+// ৪. ক্লাব প্রোফাইল লোড এবং এডিট
 // =========================================
 function loadClubDetails() {
     const clubRef = window.dbRef(window.database, 'system/clubDetails');
@@ -144,7 +171,6 @@ function loadClubDetails() {
             
             document.getElementById('display-club-contact').innerText = contactText;
 
-            // নতুন: সদস্যদের নাম লোড করা
             if (data.members) {
                 document.getElementById('display-club-members').innerText = "👥 কমিটি / মূল সদস্য: " + data.members;
             } else {
@@ -165,7 +191,7 @@ function openClubEditModal() {
         document.getElementById('edit-club-address').value = data.address || "বাগনান, উলুবেড়িয়া, হাওড়া";
         document.getElementById('edit-club-mobile').value = data.mobile || "";
         document.getElementById('edit-club-date').value = data.date || "";
-        document.getElementById('edit-club-members').value = data.members || ""; // সদস্যদের নাম ইনপুটে বসবে
+        document.getElementById('edit-club-members').value = data.members || ""; 
         document.getElementById('club-edit-modal').classList.remove('hidden');
     }, { onlyOnce: true });
 }
@@ -179,7 +205,7 @@ function saveClubDetails() {
     const address = document.getElementById('edit-club-address').value.trim();
     const mobile = document.getElementById('edit-club-mobile').value.trim();
     const date = document.getElementById('edit-club-date').value.trim();
-    const members = document.getElementById('edit-club-members').value.trim(); // সদস্যদের নাম নেওয়া হলো
+    const members = document.getElementById('edit-club-members').value.trim();
 
     if (!name) { alert("ক্লাবের নাম ফাঁকা রাখা যাবে না!"); return; }
 
@@ -307,7 +333,7 @@ function loadExpenses() {
 }
 
 // =========================================
-// ৬. গ্যালারি ও পিডিএফ লোড এবং আপলোড (Max 1MB)
+// ৬. গ্যালারি ও পিডিএফ লোড এবং আপলোড
 // =========================================
 function uploadToGallery() {
     const fileInput = document.getElementById('gallery-file-input');
