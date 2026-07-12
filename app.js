@@ -34,7 +34,7 @@ window.onload = () => {
 };
 
 // =========================================
-// ২. বছর বা সাল কন্ট্রোল (নতুন ডিলিট অপশন সহ)
+// ২. বছর বা সাল কন্ট্রোল (স্মার্ট ডিলিট লজিক সহ)
 // =========================================
 function loadYearsFromDatabase() {
     const yearsRef = window.dbRef(window.database, 'system/years');
@@ -83,31 +83,77 @@ function openAddYearPrompt() {
     }
 }
 
-// **নতুন: ভুল সাল ডিলিট করার ফাংশন**
+// **তোমার আইডিয়া অনুযায়ী স্মার্ট ও নিরাপদ সাল ডিলিট করার ফাংশন**
 window.deleteYearPrompt = function() {
     const yearToDelete = prompt("আপনি কোন সালটি ডিলিট করতে চান? (যেমন: 3000):");
-    if (yearToDelete) {
-        const yearStr = yearToDelete.trim();
-        if (availableYears.includes(yearStr)) {
-            if (availableYears.length === 1) {
-                alert("কমপক্ষে একটি সাল সিস্টেমে রাখতেই হবে! আপনি এটি ডিলিট করতে পারবেন না।");
-                return;
-            }
-            if (confirm(`আপনি কি নিশ্চিত যে আপনি ${yearStr} সালটি লিস্ট থেকে মুছে ফেলতে চান?`)) {
-                availableYears = availableYears.filter(y => y !== yearStr);
-                window.dbSet(window.dbRef(window.database, 'system/years'), availableYears).then(() => {
-                    if (currentYear === yearStr) {
-                        currentYear = availableYears[0]; // ডিলিট হওয়া সাল সিলেক্ট থাকলে অন্য সালে শিফট করবে
-                    }
-                    renderYearSelector();
-                    loadAllData();
-                    alert(`${yearStr} সাল সফলভাবে ডিলিট করা হয়েছে!`);
-                });
-            }
-        } else {
-            alert("এই সালটি ড্রপডাউন লিস্টে খুঁজে পাওয়া যায়নি!");
-        }
+    if (!yearToDelete) return;
+
+    const yearStr = yearToDelete.trim();
+    if (!availableYears.includes(yearStr)) {
+        alert("এই সালটি ড্রপডাউন লিস্টে খুঁজে পাওয়া যায়নি!");
+        return;
     }
+
+    if (availableYears.length === 1) {
+        alert("কমপক্ষে একটি সাল সিস্টেমে রাখতেই হবে! আপনি এটি ডিলিট করতে পারবেন না।");
+        return;
+    }
+
+    // ডেটাবেসে চেক করা হচ্ছে ওই সালে কোনো চাঁদা, খরচ, নোটিশ বা ছবি আছে কিনা
+    const fundRef = window.dbRef(window.database, `funds/${yearStr}`);
+    const noticeRef = window.dbRef(window.database, `notices/${yearStr}`);
+    const galleryRef = window.dbRef(window.database, `gallery/${yearStr}`);
+
+    window.dbOnValue(fundRef, (fundSnap) => {
+        window.dbOnValue(noticeRef, (noticeSnap) => {
+            window.dbOnValue(galleryRef, (gallerySnap) => {
+                
+                const hasFunds = fundSnap.exists();
+                const hasNotices = noticeSnap.exists();
+                const hasGallery = gallerySnap.exists();
+                
+                // যদি কোনো একটাতেও ডেটা থাকে, তবে hasAnyData হবে true
+                const hasAnyData = hasFunds || hasNotices || hasGallery;
+
+                if (hasAnyData) {
+                    // লজিক ১: ডেটা থাকলে ২ বার পারমিশন নেবে (Double Confirmation)
+                    let firstConfirm = confirm(`⚠️ সাবধান! ${yearStr} সালে চাঁদা, খরচ বা গ্যালারির হিসাব জমা আছে!\n\nআপনি কি সত্যিই এই সালের সমস্ত ডেটা মুছে ফেলতে চান?`);
+                    if (firstConfirm) {
+                        let secondConfirm = confirm(`🚨 শেষ সতর্কবার্তা (Final Warning)!\n\n${yearStr} সাল ডিলিট করলে এর সমস্ত হিসাব চিরকালের মতো মুছে যাবে এবং আর ফিরে পাওয়া যাবে না!\n\nআপনি কি ১০০% নিশ্চিত?`);
+                        if (secondConfirm) {
+                            performDeleteYear(yearStr);
+                        } else {
+                            alert("ডিলিট প্রক্রিয়া বাতিল করা হয়েছে। আপনার ডেটা সুরক্ষিত আছে!");
+                        }
+                    }
+                } else {
+                    // লজিক ২: সাল পুরো ফাঁকা হলে ১ ক্লিকেই ডিলিট হবে
+                    if (confirm(`${yearStr} সালটি একদম ফাঁকা (কোনো এন্ট্রি নেই)। আপনি কি এটি লিস্ট থেকে মুছে ফেলতে চান?`)) {
+                        performDeleteYear(yearStr);
+                    }
+                }
+
+            }, { onlyOnce: true });
+        }, { onlyOnce: true });
+    }, { onlyOnce: true });
+}
+
+// সাল ডিলিট করার মূল লজিক
+function performDeleteYear(yearStr) {
+    availableYears = availableYears.filter(y => y !== yearStr);
+    window.dbSet(window.dbRef(window.database, 'system/years'), availableYears).then(() => {
+        // ডেটাবেস থেকে ওই সালের ফাঁকা ফোল্ডারগুলোও মুছে দেওয়া হচ্ছে
+        window.dbRemove(window.dbRef(window.database, `funds/${yearStr}`));
+        window.dbRemove(window.dbRef(window.database, `notices/${yearStr}`));
+        window.dbRemove(window.dbRef(window.database, `gallery/${yearStr}`));
+
+        if (currentYear === yearStr) {
+            currentYear = availableYears[0];
+        }
+        renderYearSelector();
+        loadAllData();
+        alert(`${yearStr} সাল সফলভাবে ডিলিট করা হয়েছে!`);
+    });
 }
 
 function handleYearChange() {
