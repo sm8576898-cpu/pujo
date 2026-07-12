@@ -1,6 +1,6 @@
 /* Reset & Base Setup */
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-body { background-color: #12121c; color: #e2e2ec; padding-bottom: 50px; font-size: 18px; } /* ফন্ট সাইজ বড় করা হয়েছে */
+body { background-color: #12121c; color: #e2e2ec; padding-bottom: 50px; font-size: 18px; }
 .hidden { display: none !important; }
 
 /* Header Area */
@@ -74,6 +74,23 @@ body { background-color: #12121c; color: #e2e2ec; padding-bottom: 50px; font-siz
 .form-row input { flex: 1; min-width: 200px; background: #12121c; color: #fff; border: 1px solid #3d3d5c; padding: 12px 15px; font-size: 16px; border-radius: 6px; outline: none; }
 .form-row button { background: #2ed573; color: #fff; border: none; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; }
 
+/* ========================================= */
+/* 3D Custom Calendar Icon Styling (নতুন) */
+/* ========================================= */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* কালো আইকনকে সাদা করবে */
+    background-color: #3498db; /* সুন্দর নীল ব্যাকগ্রাউন্ড */
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 2px 3px rgba(255,255,255,0.4); /* 3D এফেক্ট */
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    background-color: #2ed573; /* হোভার করলে সবুজ হবে */
+    transform: scale(1.1); /* একটু বড় হয়ে লাফিয়ে উঠবে */
+}
+
 /* Responsive Table Elements */
 .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 16px; }
@@ -110,7 +127,7 @@ tbody tr:nth-child(even) { background-color: #1c1c32; }
 .image-close-btn { position: absolute; top: 20px; right: 30px; font-size: 55px; color: white; cursor: pointer; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
 .image-close-btn:hover { color: #ff4757; }
 
-/* Mobile Responsive Fixes (মোবাইল ভিউ) */
+/* Mobile Responsive Fixes */
 @media screen and (max-width: 900px) {
     .cards-grid-container { grid-template-columns: repeat(2, 1fr); }
     .fund-grid { grid-template-columns: 1fr; }
