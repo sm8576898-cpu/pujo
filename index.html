@@ -37,8 +37,12 @@
             <div class="year-selector-box" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <label for="year-select">📅 বছর বাছুন: </label>
                 <select id="year-select" onchange="handleYearChange()"></select>
-                <button id="add-year-btn" class="admin-only hidden" onclick="openAddYearPrompt()" style="background: #2ed573; color: #12121c; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">➕ নতুন বছর যোগ করুন</button>
-                <button class="admin-only hidden no-print" onclick="openClubEditModal()" style="background: #f39c12; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">⚙️ ক্লাব প্রোফাইল এডিট</button>
+                <button id="add-year-btn" class="admin-only hidden no-print" onclick="openAddYearPrompt()" style="background: #2ed573; color: #12121c; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">➕ নতুন বছর</button>
+                
+                <!-- নতুন: সাল ডিলিট বাটন -->
+                <button class="admin-only hidden no-print" onclick="deleteYearPrompt()" style="background: #ff4757; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">🗑️ সাল ডিলিট</button>
+                
+                <button class="admin-only hidden no-print" onclick="openClubEditModal()" style="background: #f39c12; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">⚙️ ক্লাব প্রোফাইল</button>
             </div>
 
             <!-- মূল তহবিল -->
@@ -99,7 +103,7 @@
             </div>
         </section>
 
-        <!-- Gallery & Document Section (Max 1MB) -->
+        <!-- Gallery & Document Section -->
         <section class="gallery-section">
             <h3>🖼️ পুজো গ্যালারি ও ডকুমেন্ট (ছবি / PDF) <span class="live-badge" style="background:#2ed573;">লাইভ</span></h3>
             
@@ -215,7 +219,6 @@
                 <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">📅 পুজোর তারিখ / দিনক্ষণ:</label>
                 <input type="text" id="edit-club-date" placeholder="যেমন: ২০ - ২৪ অক্টোবর ২০২৬ (ষষ্ঠী থেকে দশমী)" style="margin-top: 5px; margin-bottom: 12px; text-align: left; letter-spacing: normal;">
 
-                <!-- নতুন: সদস্যদের নাম লেখার ঘর -->
                 <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">👥 কমিটি / মূল সদস্যদের নাম:</label>
                 <input type="text" id="edit-club-members" placeholder="যেমন: সভাপতি: রাহুল, সম্পাদক: বিকাশ, কোষাধ্যক্ষ: সায়ন্তন" style="margin-top: 5px; margin-bottom: 15px; text-align: left; letter-spacing: normal;">
             </div>
