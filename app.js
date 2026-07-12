@@ -34,7 +34,37 @@ window.onload = () => {
 };
 
 // =========================================
-// ২. বছর বা সাল কন্ট্রোল
+// ২. ডেট কনভার্টার (পুরনো ও নতুন সব ডেটের জন্য)
+// =========================================
+function formatDateForDisplay(dateStr) {
+    if (!dateStr) return "";
+    if (dateStr.includes('/')) return dateStr; // যদি আগে থেকেই ঠিক থাকে
+    if (dateStr.includes('-')) {
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}/${parts[1]}/${parts[0]}`; // YYYY-MM-DD থেকে DD/MM/YYYY
+        }
+    }
+    return dateStr;
+}
+
+function getFormattedDate(inputDate) {
+    if (inputDate) {
+        const parts = inputDate.split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}/${parts[1]}/${parts[0]}`; 
+        }
+        return inputDate; 
+    }
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+}
+
+// =========================================
+// ৩. বছর বা সাল কন্ট্রোল
 // =========================================
 function loadYearsFromDatabase() {
     const yearsRef = window.dbRef(window.database, 'system/years');
@@ -88,15 +118,8 @@ window.deleteYearPrompt = function() {
     if (!yearToDelete) return;
 
     const yearStr = yearToDelete.trim();
-    if (!availableYears.includes(yearStr)) {
-        alert("এই সালটি ড্রপডাউন লিস্টে খুঁজে পাওয়া যায়নি!");
-        return;
-    }
-
-    if (availableYears.length === 1) {
-        alert("কমপক্ষে একটি সাল সিস্টেমে রাখতেই হবে! আপনি এটি ডিলিট করতে পারবেন না।");
-        return;
-    }
+    if (!availableYears.includes(yearStr)) { alert("এই সালটি ড্রপডাউন লিস্টে খুঁজে পাওয়া যায়নি!"); return; }
+    if (availableYears.length === 1) { alert("কমপক্ষে একটি সাল সিস্টেমে রাখতেই হবে! আপনি এটি ডিলিট করতে পারবেন না।"); return; }
 
     const fundRef = window.dbRef(window.database, `funds/${yearStr}`);
     const noticeRef = window.dbRef(window.database, `notices/${yearStr}`);
@@ -105,25 +128,18 @@ window.deleteYearPrompt = function() {
     window.dbOnValue(fundRef, (fundSnap) => {
         window.dbOnValue(noticeRef, (noticeSnap) => {
             window.dbOnValue(galleryRef, (gallerySnap) => {
-                
                 const hasAnyData = fundSnap.exists() || noticeSnap.exists() || gallerySnap.exists();
-
                 if (hasAnyData) {
                     let firstConfirm = confirm(`⚠️ সাবধান! ${yearStr} সালে চাঁদা, খরচ বা গ্যালারির হিসাব জমা আছে!\n\nআপনি কি সত্যিই এই সালের সমস্ত ডেটা মুছে ফেলতে চান?`);
                     if (firstConfirm) {
                         let secondConfirm = confirm(`🚨 শেষ সতর্কবার্তা (Final Warning)!\n\n${yearStr} সাল ডিলিট করলে এর সমস্ত হিসাব চিরকালের মতো মুছে যাবে এবং আর ফিরে পাওয়া যাবে না!\n\nআপনি কি ১০০% নিশ্চিত?`);
-                        if (secondConfirm) {
-                            performDeleteYear(yearStr);
-                        } else {
-                            alert("ডিলিট প্রক্রিয়া বাতিল করা হয়েছে। আপনার ডেটা সুরক্ষিত আছে!");
-                        }
+                        if (secondConfirm) performDeleteYear(yearStr);
                     }
                 } else {
                     if (confirm(`${yearStr} সালটি একদম ফাঁকা (কোনো এন্ট্রি নেই)। আপনি কি এটি লিস্ট থেকে মুছে ফেলতে চান?`)) {
                         performDeleteYear(yearStr);
                     }
                 }
-
             }, { onlyOnce: true });
         }, { onlyOnce: true });
     }, { onlyOnce: true });
@@ -135,11 +151,9 @@ function performDeleteYear(yearStr) {
         window.dbRemove(window.dbRef(window.database, `funds/${yearStr}`));
         window.dbRemove(window.dbRef(window.database, `notices/${yearStr}`));
         window.dbRemove(window.dbRef(window.database, `gallery/${yearStr}`));
-        window.dbRemove(window.dbRef(window.database, `system/pujaDates/${yearStr}`)); // ওই সালের ডেট ডিলিট
+        window.dbRemove(window.dbRef(window.database, `system/pujaDates/${yearStr}`)); 
 
-        if (currentYear === yearStr) {
-            currentYear = availableYears[0];
-        }
+        if (currentYear === yearStr) currentYear = availableYears[0];
         renderYearSelector();
         loadAllData();
         alert(`${yearStr} সাল সফলভাবে ডিলিট করা হয়েছে!`);
@@ -152,7 +166,7 @@ function handleYearChange() {
 }
 
 // =========================================
-// ৩. অ্যাডমিন লগইন / লগআউট কন্ট্রোল
+// ৪. অ্যাডমিন লগইন / লগআউট কন্ট্রোল
 // =========================================
 function toggleAdminModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
 
@@ -190,25 +204,6 @@ function logoutAdmin() {
 }
 
 // =========================================
-// ৪. স্পেশাল ডেট কনভার্টার (DD/MM/YYYY)
-// =========================================
-function getFormattedDate(inputDate) {
-    if (inputDate) {
-        const parts = inputDate.split('-');
-        if (parts.length === 3) {
-            return `${parts[2]}/${parts[1]}/${parts[0]}`; // Convert YYYY-MM-DD to DD/MM/YYYY
-        }
-        return inputDate; // Fallback
-    }
-    // যদি ম্যানুয়াল ডেট না দেওয়া থাকে, তবে আজকের ডেট নেবে
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const yyyy = today.getFullYear();
-    return `${dd}/${mm}/${yyyy}`;
-}
-
-// =========================================
 // ৫. ক্লাব প্রোফাইল এবং ডায়নামিক তারিখ লোড
 // =========================================
 function loadClubDetails() {
@@ -229,7 +224,7 @@ function loadPujaDate() {
     window.dbOnValue(dateRef, (snapshot) => {
         let dateVal = snapshot.exists() ? snapshot.val() : "";
         document.getElementById('display-club-date').innerText = "📅 পুজোর তারিখ: " + (dateVal || "অ্যাডমিন প্যানেল থেকে যোগ করুন");
-        document.getElementById('edit-club-date').value = dateVal; // এডিট মডালের বক্সে আপডেট
+        document.getElementById('edit-club-date').value = dateVal; 
     });
 }
 
@@ -241,7 +236,6 @@ function openClubEditModal() {
         document.getElementById('edit-club-address').value = data.address || "বাগনান, উলুবেড়িয়া, হাওড়া";
         document.getElementById('edit-club-mobile').value = data.mobile || "";
         document.getElementById('edit-club-members').value = data.members || ""; 
-        // ডেট অলরেডি loadPujaDate থেকে ইনপুটে বসে গেছে
         document.getElementById('club-edit-modal').classList.remove('hidden');
     }, { onlyOnce: true });
 }
@@ -259,14 +253,12 @@ function saveClubDetails() {
 
     if (!name) { alert("ক্লাবের নাম ফাঁকা রাখা যাবে না!"); return; }
 
-    // গ্লোবাল ডিটেলস সেভ
     window.dbSet(window.dbRef(window.database, 'system/clubDetails'), {
         name: name,
         address: address,
         mobile: mobile,
         members: members
     }).then(() => {
-        // শুধুমাত্র এই নির্দিষ্ট সালের জন্য ডেট সেভ
         window.dbSet(window.dbRef(window.database, `system/pujaDates/${currentYear}`), pujaDate).then(() => {
             alert("ক্লাবের বিবরণ এবং তারিখ সফলভাবে আপডেট হয়েছে!");
             closeClubEditModal();
@@ -275,10 +267,10 @@ function saveClubDetails() {
 }
 
 // =========================================
-// ৬. ডেটা লোড করা (Notices, Funds, Expenses, Gallery)
+// ৬. ডেটা লোড করা (সব জায়গায় Display Formatter বসানো হয়েছে)
 // =========================================
 function loadAllData() {
-    loadPujaDate(); // সাল পাল্টালে তারিখ পাল্টাবে
+    loadPujaDate(); 
     loadNotices();
     loadFinancialData();
     loadExpenses();
@@ -304,7 +296,7 @@ function loadNotices() {
                 
                 noticeList.innerHTML += `
                     <div class="notice-item">
-                        <span class="notice-date">${notice.date}</span>
+                        <span class="notice-date">${formatDateForDisplay(notice.date)}</span>
                         ${notice.text}
                         ${actionHtml}
                     </div>
@@ -320,7 +312,6 @@ function loadFinancialData() {
     const yearRef = window.dbRef(window.database, `funds/${currentYear}`);
     window.dbOnValue(yearRef, (snapshot) => {
         let totalIncome = 0; let totalExpense = 0;
-        
         let categoryTotals = { 'mukto_haste': 0, 'guest_card': 0, 'matha_pichu': 0, 'adhai': 0 };
 
         if (snapshot.exists()) {
@@ -366,7 +357,7 @@ function loadExpenses() {
                 
                 tbody.innerHTML += `
                     <tr>
-                        <td>${item.date}</td>
+                        <td>${formatDateForDisplay(item.date)}</td>
                         <td>${item.purpose}</td>
                         <td style="color:#ff4757; font-weight:bold;">₹${item.amount}</td>
                         ${actionHtml}
@@ -446,7 +437,7 @@ function loadGallery() {
                         </div>`;
                 }
                 const deleteHtml = isAdmin ? `<div style="margin-top:8px;"><button class="delete-entry-btn" onclick="deleteData('gallery/${currentYear}/${key}')" style="background:#ff4757; width:80%;">🗑️ ডিলিট করুন</button></div>` : '';
-                grid.innerHTML += `<div class="gallery-card">${previewHtml}<h4>${item.title}</h4><p>📅 ${item.date}</p>${deleteHtml}</div>`;
+                grid.innerHTML += `<div class="gallery-card">${previewHtml}<h4>${item.title}</h4><p>📅 ${formatDateForDisplay(item.date)}</p>${deleteHtml}</div>`;
             });
         } else {
             grid.innerHTML = '<p style="color:#a0a0b5; font-size:14px; grid-column: 1/-1; text-align:center;">এই সালের গ্যালারিতে কোনো ছবি বা ডকুমেন্ট আপলোড করা হয়নি।</p>';
@@ -455,7 +446,7 @@ function loadGallery() {
 }
 
 // =========================================
-// ৮. মডাল ও ক্যাটাগরি ডেটা (অ্যাকশন কলাম হাইড সহ)
+// ৮. মডাল ও ক্যাটাগরি ডেটা
 // =========================================
 function openCategoryModal(categoryId, title) {
     currentCategory = categoryId;
@@ -482,7 +473,6 @@ function loadCategoryData() {
                 const item = data[key];
                 const safeName = item.name.replace(/"/g, '&quot;');
                 
-                // শুধুমাত্র অ্যাডমিন হলে পুরো অ্যাকশন কলাম (শেয়ার, এডিট, ডিলিট) লোড হবে
                 const actionHtml = isAdmin ? `
                     <td class="admin-only no-print" style="white-space: nowrap;">
                         <button onclick="shareWhatsApp('${safeName}', '${item.amount}')" style="background:#25D366;color:white;border:none;padding:5px 8px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:3px;font-weight:bold;">💬 শেয়ার</button>
@@ -492,7 +482,7 @@ function loadCategoryData() {
                 
                 tbody.innerHTML += `
                     <tr>
-                        <td>${item.date}</td>
+                        <td>${formatDateForDisplay(item.date)}</td>
                         <td>${item.name}</td>
                         <td style="color:#2ed573; font-weight:bold;">₹${item.amount}</td>
                         ${actionHtml}
@@ -506,12 +496,12 @@ function loadCategoryData() {
 }
 
 // =========================================
-// ৯. ডেটা সেভ করা (DD/MM/YYYY কনভার্টার সহ)
+// ৯. ডেটা সেভ করা
 // =========================================
 function addNewNotice() {
     const text = document.getElementById('new-notice-text').value;
     if (!text) { alert("নোটিশ ফাঁকা রাখা যাবে না!"); return; }
-    const dateStr = getFormattedDate(); // DD/MM/YYYY
+    const dateStr = getFormattedDate(); 
     window.dbPush(window.dbRef(window.database, `notices/${currentYear}`), { text: text, date: dateStr })
         .then(() => document.getElementById('new-notice-text').value = '');
 }
@@ -520,7 +510,7 @@ function addExpenseEntry() {
     const purpose = document.getElementById('exp-purpose').value;
     const amount = document.getElementById('exp-amount').value;
     const dateInput = document.getElementById('exp-date').value;
-    const dateStr = getFormattedDate(dateInput); // DD/MM/YYYY
+    const dateStr = getFormattedDate(dateInput); 
     if (!purpose || !amount) { alert("বিবরণ এবং টাকার পরিমাণ দিতেই হবে!"); return; }
     window.dbPush(window.dbRef(window.database, `funds/${currentYear}/expenses`), { purpose: purpose, amount: Number(amount), date: dateStr })
         .then(() => { document.getElementById('exp-purpose').value = ''; document.getElementById('exp-amount').value = ''; });
@@ -530,7 +520,7 @@ function addCategoryDataEntry() {
     const name = document.getElementById('data-name').value;
     const amount = document.getElementById('data-amount').value;
     const dateInput = document.getElementById('data-date').value;
-    const dateStr = getFormattedDate(dateInput); // DD/MM/YYYY
+    const dateStr = getFormattedDate(dateInput); 
     if (!name || !amount) { alert("নাম এবং টাকার পরিমাণ দিতেই হবে!"); return; }
     window.dbPush(window.dbRef(window.database, `funds/${currentYear}/${currentCategory}`), { name: name, amount: Number(amount), date: dateStr })
         .then(() => { document.getElementById('data-name').value = ''; document.getElementById('data-amount').value = ''; });
