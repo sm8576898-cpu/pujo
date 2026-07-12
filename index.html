@@ -10,10 +10,12 @@
 </head>
 <body>
 
+    <!-- View Counter Header Section -->
     <div style="text-align: center; background: #1a1a2e; padding: 10px; color: #2ed573; font-weight: bold; border-bottom: 2px solid #282846; font-size: 15px;">
         👁️ মোট অ্যাপ ভিজিটর: <span id="app-view-count">০</span>
     </div>
 
+    <!-- Header Section -->
     <header class="main-header">
         <div class="club-info-container">
             <h1 id="display-club-name">🪔 আমাদের গ্রাম্য পুজো কমিটি</h1>
@@ -34,6 +36,7 @@
         </div>
     </header>
 
+    <!-- Main Container -->
     <main class="main-container">
         <section class="control-panel">
             <div class="year-selector-box" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
@@ -44,6 +47,7 @@
                 <button class="admin-only hidden no-print" onclick="openClubEditModal()" style="background: #f39c12; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">⚙️ ক্লাব প্রোফাইল</button>
             </div>
 
+            <!-- মূল তহবিল -->
             <div class="bokbhandar-card">
                 <h3>🪙 পুজো মূল তহবিল</h3>
                 <div class="fund-grid">
@@ -63,6 +67,7 @@
             </div>
         </section>
 
+        <!-- Notice Board -->
         <section class="notice-board-section">
             <h3>📋 নোটিশ বোর্ড <span class="live-badge">লাইভ</span></h3>
             <div id="notice-list" class="notice-container"></div>
@@ -72,6 +77,7 @@
             </div>
         </section>
 
+        <!-- 3D Style Main Function Cards -->
         <section class="cards-grid-container">
             <div class="card-3d" onclick="openCategoryModal('mukto_haste', '🎁 মুক্ত হস্তে দান')">
                 <div class="card-icon">🎁</div>
@@ -99,6 +105,7 @@
             </div>
         </section>
 
+        <!-- Gallery & Document Section -->
         <section class="gallery-section">
             <h3>🖼️ পুজো গ্যালারি ও ডকুমেন্ট (ছবি / PDF) <span class="live-badge" style="background:#2ed573;">লাইভ</span></h3>
             
@@ -113,9 +120,11 @@
             </div>
 
             <div id="gallery-grid" class="gallery-grid">
-                </div>
+                <!-- ডায়নামিক ছবি ও ডকুমেন্ট এখানে লোড হবে -->
+            </div>
         </section>
 
+        <!-- Expense Section -->
         <section class="expense-large-section">
             <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <h3>💸 পুজোর খরচের খতিয়ান</h3>
@@ -130,7 +139,8 @@
                 <div class="form-row">
                     <input type="text" id="exp-purpose" placeholder="খরচের খাত (যেমন: প্রতিমা, প্যান্ডেল)">
                     <input type="number" id="exp-amount" placeholder="টাকার পরিমাণ (₹)">
-                    <input type="date" id="exp-date">
+                    <!-- স্পেশাল ম্যাজিক ট্রিক: দিন/মাস/বছর -->
+                    <input type="text" id="exp-date" placeholder="দিন/মাস/বছর (dd/mm/yyyy)" onfocus="(this.type='date')" onblur="(this.value == '' ? this.type='text' : this.type='date')">
                     <button onclick="addExpenseEntry()">➕ খরচ যোগ করুন</button>
                 </div>
             </div>
@@ -146,12 +156,14 @@
                         </tr>
                     </thead>
                     <tbody id="expense-table-body">
-                        </tbody>
+                        <!-- Data rows dynamically added -->
+                    </tbody>
                 </table>
             </div>
         </section>
     </main>
 
+    <!-- Data Category Modal Container -->
     <div id="data-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 2px solid #ff9f43; padding: 15px; background: #151525;">
@@ -169,7 +181,8 @@
                     <div class="form-row">
                         <input type="text" id="data-name" placeholder="নাম / উৎসের বিবরণ">
                         <input type="number" id="data-amount" placeholder="টাকার পরিমাণ (₹)">
-                        <input type="date" id="data-date">
+                        <!-- স্পেশাল ম্যাজিক ট্রিক: দিন/মাস/বছর -->
+                        <input type="text" id="data-date" placeholder="দিন/মাস/বছর (dd/mm/yyyy)" onfocus="(this.type='date')" onblur="(this.value == '' ? this.type='text' : this.type='date')">
                         <button onclick="addCategoryDataEntry()">📥 সেভ করুন</button>
                     </div>
                 </div>
@@ -185,13 +198,15 @@
                             </tr>
                         </thead>
                         <tbody id="modal-table-body">
-                            </tbody>
+                            <!-- Rows dynamic -->
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Club Profile Edit Modal -->
     <div id="club-edit-modal" class="modal-overlay hidden">
         <div class="auth-modal-content" style="width: 90%; max-width: 450px; text-align: left;">
             <h3 style="text-align: center; border-bottom: 1px solid #3d3d5c; padding-bottom: 10px;">⚙️ ক্লাব প্রোফাইল ও তারিখ এডিট</h3>
@@ -219,6 +234,7 @@
         </div>
     </div>
 
+    <!-- Admin Login Modal -->
     <div id="auth-modal" class="modal-overlay hidden">
         <div class="auth-modal-content">
             <h3>🔒 অ্যাডমিন প্যানেল লগইন</h3>
@@ -237,11 +253,13 @@
         </div>
     </div>
 
+    <!-- Full Screen Image Viewer Modal -->
     <div id="image-viewer-modal" class="image-viewer-overlay hidden">
         <span class="image-close-btn" onclick="closeImageViewer()">&times;</span>
         <img id="full-size-image" class="image-viewer-content" src="" alt="Full size image">
     </div>
 
+    <!-- ফায়ারবেস (Firebase) কানেকশন স্ক্রিপ্ট -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
