@@ -296,7 +296,7 @@ window.saveClubDetails = function() {
     const members = document.getElementById('edit-club-members').value.trim();
     const pujaDate = document.getElementById('edit-club-date').value.trim();
 
-    if (!name) { alert("ক্লাবের নাম ফাঁকা রাখা যাবে না!"); return; }
+    if (!name) { alert("ক্লাবের নাম ফাঁকা রাখা যাবে চেতনা!"); return; }
 
     window.dbSet(window.dbRef(window.database, `data/${activeMainCategory}/system/clubDetails`), {
         name: name, address: address, mobile: mobile, members: members
