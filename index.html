@@ -153,11 +153,11 @@
         </main>
     </div>
 
-    <!-- Login & Signup Modal (z-index 4000 করা হয়েছে) -->
+    <!-- Admin Login Modal (শুধু লগইন অপশন রাখা হয়েছে) -->
     <div id="auth-modal" class="modal-overlay hidden" style="z-index: 4000;">
         <div class="auth-modal-content">
-            <h3 id="auth-modal-title">🔒 লগইন করুন</h3>
-            <p id="auth-modal-desc" style="margin-bottom: 15px;">আপনার অ্যাকাউন্ট অ্যাক্সেস করতে জিমেইল ও পাসওয়ার্ড দিন</p>
+            <h3 id="auth-modal-title">🔒 অ্যাডমিন লগইন</h3>
+            <p id="auth-modal-desc" style="margin-bottom: 15px;">শুধুমাত্র অ্যাডমিনরা ইমেইল ও পাসওয়ার্ড দিয়ে লগইন করুন</p>
             
             <input type="email" id="auth-email" placeholder="আপনার জিমেইল (Email)" style="letter-spacing: normal; margin-bottom: 15px;">
             
@@ -170,11 +170,6 @@
                 <button class="login-submit-btn" id="auth-action-btn" onclick="submitAuth()" style="flex: 1; background: #2ed573; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">লগইন করুন</button>
                 <button class="login-cancel-btn" onclick="toggleAuthModal()" style="flex: 1; background: #ff4757; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">❌ বন্ধ করুন</button>
             </div>
-
-            <p style="margin-top: 20px; text-align: center; font-size: 15px;">
-                <span id="auth-switch-text">নতুন অ্যাকাউন্ট বানাতে চান?</span> 
-                <span onclick="toggleAuthMode()" style="color: #2ed573; cursor: pointer; font-weight: bold; text-decoration: underline;">এখানে ক্লিক করুন</span>
-            </p>
         </div>
     </div>
 
@@ -242,7 +237,7 @@
     <!-- Firebase Connection -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
@@ -259,7 +254,6 @@
         window.database = getDatabase(app);
         
         window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
         window.signOut = signOut;
         window.onAuthStateChanged = onAuthStateChanged;
         window.dbRef = ref;
