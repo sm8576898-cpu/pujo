@@ -148,3 +148,39 @@ tbody tr:nth-child(even) { background-color: #1c1c32; }
     .modal-header { flex-direction: column; text-align: center; gap: 15px; }
     .modal-header > div { justify-content: center; width: 100%; }
 }
+/* ========================================= */
+/* New Multi-Layer UI & Category Buttons     */
+/* ========================================= */
+
+.category-buttons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.cat-btn {
+    background: #1a1a2e;
+    color: #fff;
+    border: 2px solid #3d3d5c;
+    padding: 20px;
+    font-size: 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    font-weight: bold;
+}
+
+.cat-btn:hover {
+    background: #2ed573;
+    color: #12121c;
+    border-color: #2ed573;
+    transform: translateY(-3px);
+}
+
+@media screen and (max-width: 600px) {
+    .category-buttons-grid {
+        grid-template-columns: 1fr;
+    }
+}
