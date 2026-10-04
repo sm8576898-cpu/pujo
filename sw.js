@@ -1,4 +1,4 @@
-const CACHE_NAME = 'puja-hisab-v2'; // ভার্সন v2 করে দেওয়া হলো
+const CACHE_NAME = 'puja-hisab-v3'; 
 const urlsToCache = [
   '/',
   '/index.html',
@@ -8,7 +8,6 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
-  // পুরনো ক্যাশ ডিলিট করে নতুনটা ইনস্টল করবে
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
