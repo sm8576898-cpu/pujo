@@ -3,7 +3,6 @@ let currentYear = new Date().getFullYear().toString();
 let currentCategory = ''; 
 let availableYears = []; 
 let activeMainCategory = ''; 
-let isLoginMode = true; 
 
 const pujaNames = {
     'Ganga_Puja': '🌊 গঙ্গা পুজো',
@@ -17,7 +16,6 @@ const pujaNames = {
 // =========================================
 window.onload = () => {
     setTimeout(() => {
-        // অ্যাপ খুললেই প্রথমে পুজো সিলেক্ট করার পেজ দেখাবে (লগইন ছাড়াই)
         document.getElementById('auth-modal').classList.add('hidden');
         if (!activeMainCategory) {
             document.getElementById('category-selection-screen').classList.remove('hidden');
@@ -27,7 +25,7 @@ window.onload = () => {
         if (window.onAuthStateChanged) {
             window.onAuthStateChanged(window.auth, (user) => {
                 if (user) {
-                    isAdmin = true; // অ্যাডমিন লগইন আছে
+                    isAdmin = true;
                     document.getElementById('admin-login-btn').classList.add('hidden');
                     document.getElementById('admin-logout-btn').classList.remove('hidden');
                     
@@ -42,7 +40,7 @@ window.onload = () => {
                         document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
                     }
                 } else {
-                    isAdmin = false; // সাধারণ ইউজার (লগইন নেই)
+                    isAdmin = false;
                     document.getElementById('admin-login-btn').classList.remove('hidden');
                     document.getElementById('admin-logout-btn').classList.add('hidden');
                     
@@ -61,7 +59,7 @@ window.onload = () => {
 };
 
 // =========================================
-// ২. সাইন-আপ এবং লগইন কন্ট্রোল
+// ২. শুধু অ্যাডমিন লগইন কন্ট্রোল
 // =========================================
 window.toggleAuthModal = function() {
     document.getElementById('auth-modal').classList.toggle('hidden');
@@ -77,42 +75,17 @@ window.togglePasswordVisibility = function() {
     }
 }
 
-window.toggleAuthMode = function() {
-    isLoginMode = !isLoginMode;
-    if(isLoginMode) {
-        document.getElementById('auth-modal-title').innerText = '🔒 লগইন করুন';
-        document.getElementById('auth-modal-desc').innerText = 'আপনার অ্যাকাউন্ট অ্যাক্সেস করতে জিমেইল ও পাসওয়ার্ড দিন';
-        document.getElementById('auth-action-btn').innerText = 'লগইন করুন';
-        document.getElementById('auth-switch-text').innerText = 'নতুন অ্যাকাউন্ট বানাতে চান?';
-    } else {
-        document.getElementById('auth-modal-title').innerText = '🆕 নতুন অ্যাকাউন্ট তৈরি';
-        document.getElementById('auth-modal-desc').innerText = 'আপনার জিমেইল দিয়ে নতুন অ্যাডমিন অ্যাকাউন্ট খুলুন';
-        document.getElementById('auth-action-btn').innerText = 'অ্যাকাউন্ট তৈরি করুন';
-        document.getElementById('auth-switch-text').innerText = 'আগে থেকেই অ্যাকাউন্ট আছে?';
-    }
-}
-
 window.submitAuth = function() {
     const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
     if(!email || !password) { alert("ইমেইল এবং পাসওয়ার্ড দিতেই হবে!"); return; }
     
-    if(isLoginMode) {
-        window.signInWithEmailAndPassword(window.auth, email, password)
-        .then(() => {
-            document.getElementById('auth-email').value = '';
-            document.getElementById('auth-password').value = '';
-            document.getElementById('auth-modal').classList.add('hidden');
-        }).catch((error) => { alert("ভুল ইমেইল বা পাসওয়ার্ড! আবার চেষ্টা করুন।"); });
-    } else {
-        window.createUserWithEmailAndPassword(window.auth, email, password)
-        .then(() => {
-            alert("নতুন অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!");
-            document.getElementById('auth-email').value = '';
-            document.getElementById('auth-password').value = '';
-            document.getElementById('auth-modal').classList.add('hidden');
-        }).catch((error) => { alert("অ্যাকাউন্ট তৈরি করা যায়নি: " + error.message); });
-    }
+    window.signInWithEmailAndPassword(window.auth, email, password)
+    .then(() => {
+        document.getElementById('auth-email').value = '';
+        document.getElementById('auth-password').value = '';
+        document.getElementById('auth-modal').classList.add('hidden');
+    }).catch((error) => { alert("ভুল ইমেইল বা পাসওয়ার্ড! আবার চেষ্টা করুন।"); });
 }
 
 window.logoutUser = function() {
@@ -125,7 +98,7 @@ window.logoutUser = function() {
 }
 
 // =========================================
-// ৩. পুজো ক্যাটাগরি কন্ট্রোল (পাবলিক ভিউ)
+// ৩. পুজো ক্যাটাগরি কন্ট্রোল
 // =========================================
 window.selectMainCategory = function(cat) {
     activeMainCategory = cat;
@@ -296,7 +269,7 @@ window.saveClubDetails = function() {
     const members = document.getElementById('edit-club-members').value.trim();
     const pujaDate = document.getElementById('edit-club-date').value.trim();
 
-    if (!name) { alert("ক্লাবের নাম ফাঁকা রাখা যাবে চেতনা!"); return; }
+    if (!name) { alert("ক্লাবের নাম ফাঁকা রাখা যাবে না!"); return; }
 
     window.dbSet(window.dbRef(window.database, `data/${activeMainCategory}/system/clubDetails`), {
         name: name, address: address, mobile: mobile, members: members
@@ -397,15 +370,23 @@ function loadExpenses() {
 }
 
 // =========================================
-// ৮. গ্যালারি ও পিডিএফ
+// ৮. গ্যালারি ও পিডিএফ (উন্নত কম্প্রেশন সহ)
 // =========================================
 window.uploadToGallery = function() {
     const fileInput = document.getElementById('gallery-file-input');
     const titleInput = document.getElementById('gallery-title').value.trim();
+    
     if (!fileInput.files || fileInput.files.length === 0) { alert("ফাইল সিলেক্ট করুন!"); return; }
     if (!titleInput) { alert("ডকুমেন্টের নাম দিন!"); return; }
+    
     const file = fileInput.files[0];
-    if (file.size > 1024 * 1024) { alert("⚠️ ফাইল সাইজ 1MB-র চেয়ে বড়!"); fileInput.value = ''; return; }
+    // ১ এমবি (1MB) লিমিট চেক
+    if (file.size > 1024 * 1024) { 
+        alert("⚠️ ফাইল সাইজ 1MB-র চেয়ে বড়! দয়া করে ছোট সাইজের ছবি বা ডকুমেন্ট দিন।"); 
+        fileInput.value = ''; 
+        return; 
+    }
+    
     const dateStr = getFormattedDate(); 
 
     if (file.type === "application/pdf") {
@@ -419,15 +400,28 @@ window.uploadToGallery = function() {
             img.onload = function() {
                 const canvas = document.createElement("canvas");
                 let width = img.width, height = img.height;
-                if (width > height) { if (width > 800) { height *= 800 / width; width = 800; } } 
-                else { if (height > 800) { width *= 800 / height; height = 800; } }
-                canvas.width = width; canvas.height = height;
+                
+                // ছবিকে ১০০ কেবির নিচে রাখতে সর্বোচ্চ রেজোলিউশন ৭২০ পিক্সেল (720px) করা হলো
+                const MAX_SIZE = 720;
+                if (width > height) { 
+                    if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } 
+                } else { 
+                    if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; } 
+                }
+                
+                canvas.width = width; 
+                canvas.height = height;
                 canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-                saveToFirebaseGallery(titleInput, canvas.toDataURL("image/jpeg", 0.6), "image/jpeg", dateStr, fileInput);
+                
+                // ছবির কোয়ালিটি ০.৬ (60%) সেট করা হলো যাতে ছবি না ফাটে কিন্তু সাইজ ৫০-৮০ কেবির মধ্যে থাকে
+                const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.6);
+                saveToFirebaseGallery(titleInput, compressedDataUrl, "image/jpeg", dateStr, fileInput);
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
+    } else {
+        alert("শুধুমাত্র ছবি (Image) বা পিডিএফ (PDF) সাপোর্ট করে!");
     }
 }
 
