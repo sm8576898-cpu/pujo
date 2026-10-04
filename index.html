@@ -10,11 +10,11 @@
 </head>
 <body>
 
-    <!-- Category Selection Screen (লগইন করার পর এই স্ক্রিন আসবে) -->
-    <div id="category-selection-screen" class="modal-overlay hidden" style="background: #12121c; z-index: 3000;">
+    <!-- Category Selection Screen (সবাই দেখতে পাবে) -->
+    <div id="category-selection-screen" class="modal-overlay" style="background: #12121c; z-index: 3000;">
         <div class="auth-modal-content" style="text-align: center; margin-top: 10vh;">
             <h2 style="color: #ff9f43; margin-bottom: 10px;">🙏 পুজো নির্বাচন করুন</h2>
-            <p style="color: #a0a0b5; margin-bottom: 25px;">আপনি কোন পুজোর হিসাব দেখতে বা কাজ করতে চান?</p>
+            <p style="color: #a0a0b5; margin-bottom: 25px;">আপনি কোন পুজোর হিসাব দেখতে চান?</p>
             
             <div class="category-buttons-grid">
                 <button onclick="selectMainCategory('Ganga_Puja')" class="cat-btn">🌊 গঙ্গা পুজো</button>
@@ -23,11 +23,12 @@
                 <button onclick="selectMainCategory('Sitala_Gan')" class="cat-btn">🎵 মা শীতলার গান</button>
             </div>
             
-            <button onclick="logoutUser()" style="margin-top: 30px; background: #ff4757; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">লগআউট করুন</button>
+            <!-- এই লগইন বাটনটা শুধু অ্যাডমিনের জন্য -->
+            <button id="cat-screen-admin-btn" onclick="toggleAuthModal()" style="margin-top: 30px; background: #3498db; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">🔒 অ্যাডমিন লগইন</button>
         </div>
     </div>
 
-    <!-- Main App Wrapper (লগইন ও ক্যাটাগরি সিলেক্ট না হওয়া পর্যন্ত লুকানো থাকবে) -->
+    <!-- Main App Wrapper (পুজো সিলেক্ট করার পর দেখাবে) -->
     <div id="main-app-wrapper" class="hidden">
         
         <div style="text-align: center; background: #1a1a2e; padding: 10px; color: #2ed573; font-weight: bold; border-bottom: 2px solid #282846; font-size: 15px;">
@@ -43,12 +44,12 @@
                     <span id="display-club-date">📅 পুজোর তারিখ: লোড হচ্ছে...</span>
                 </p>
                 <p id="display-club-members" style="color: #2ed573; font-size: 13px; margin-top: 5px; font-weight: bold;">👥 কমিটি / মূল সদস্য: লোড হচ্ছে...</p>
-                <button class="admin-only hidden no-print" onclick="openClubEditModal()" style="margin-top: 12px; background: #ffd700; color: #12121c; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">⚙️ ক্লাব প্রোফাইল এডিট করুন</button>
+                <button class="admin-only hidden no-print" onclick="openClubEditModal()" style="margin-top: 12px; background: #ffd700; color: #12121c; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">⚙️️ ক্লাব প্রোফাইল এডিট করুন</button>
             </div>
             <div class="auth-box">
-                <button onclick="switchCategory()" style="background:#3498db; margin-right:10px;">🔄 পুজো পরিবর্তন</button>
-                <button id="admin-login-btn" onclick="toggleAuthModal()">🔒 লগইন করুন</button>
-                <button id="admin-logout-btn" class="hidden" onclick="logoutUser()">🔓 লগআউট</button>
+                <button onclick="switchCategory()" style="background:#3498db; margin-right:10px; border:none; padding:12px 24px; font-weight:bold; border-radius:8px; cursor:pointer; color:white;">🔄 পুজো পরিবর্তন</button>
+                <button id="admin-login-btn" onclick="toggleAuthModal()" style="background:#ff9f43; color:#12121c; border:none; padding:12px 24px; font-weight:bold; border-radius:8px; cursor:pointer;">🔒 লগইন</button>
+                <button id="admin-logout-btn" class="hidden" onclick="logoutUser()" style="background:#ff4757; color:white; border:none; padding:12px 24px; font-weight:bold; border-radius:8px; cursor:pointer;">🔓 লগআউট</button>
             </div>
         </header>
 
@@ -62,6 +63,7 @@
                     <button class="admin-only hidden no-print" onclick="deleteYearPrompt()" style="background: #ff4757; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">🗑️ সাল ডিলিট</button>
                 </div>
 
+                <!-- মূল তহবিল -->
                 <div class="bokbhandar-card">
                     <h3>🪙 পুজো মূল তহবিল</h3>
                     <div class="fund-grid">
@@ -98,7 +100,7 @@
                     <h3>মুক্ত হস্তে দান</h3>
                     <div id="sum-mukto_haste" style="color: #2ed573; font-weight: bold; font-size: 15px; margin-top: 10px; border-top: 1px solid #282846; padding-top: 10px;">মোট জমা: ₹০.০০</div>
                 </div>
-                <div class="card-3d" onclick="openCategoryModal('guest_card', '🎟️️ গেস্ট কার্ড বিতরণ')">
+                <div class="card-3d" onclick="openCategoryModal('guest_card', '🎟️ গেস্ট কার্ড বিতরণ')">
                     <div class="card-icon">🎟️</div>
                     <h3>গেস্ট কার্ড বিতরণ</h3>
                     <div id="sum-guest_card" style="color: #2ed573; font-weight: bold; font-size: 15px; margin-top: 10px; border-top: 1px solid #282846; padding-top: 10px;">মোট জমা: ₹০.০০</div>
@@ -132,6 +134,10 @@
             <section class="expense-large-section">
                 <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <h3>💸 পুজোর খরচের খতিয়ান</h3>
+                    <div>
+                        <input type="text" id="search-expense" onkeyup="searchTable('search-expense', 'expense-table-body')" placeholder="🔍 বিবরণ খুঁজুন..." style="padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; color: black; margin-right: 5px; width: 180px;">
+                        <button onclick="printSection('খরচের খতিয়ান', 'expense-table-container')" style="background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">🖨️ PDF / প্রিন্ট</button>
+                    </div>
                 </div>
                 
                 <div class="admin-only hidden expense-entry-box" style="margin-top: 15px;">
@@ -153,10 +159,10 @@
                 </div>
             </section>
         </main>
-    </div> <!-- End Main App Wrapper -->
+    </div>
 
     <!-- Login & Signup Modal -->
-    <div id="auth-modal" class="modal-overlay">
+    <div id="auth-modal" class="modal-overlay hidden">
         <div class="auth-modal-content">
             <h3 id="auth-modal-title">🔒 লগইন করুন</h3>
             <p id="auth-modal-desc" style="margin-bottom: 15px;">আপনার অ্যাকাউন্ট অ্যাক্সেস করতে জিমেইল ও পাসওয়ার্ড দিন</p>
@@ -168,8 +174,9 @@
                 <span id="toggle-password-eye" onclick="togglePasswordVisibility()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; user-select: none;">👁️</span>
             </div>
             
-            <div class="auth-buttons" style="display: flex; flex-direction: column; gap: 10px;">
-                <button class="login-submit-btn" id="auth-action-btn" onclick="submitAuth()" style="width: 100%; margin: 0;">লগইন করুন</button>
+            <div class="auth-buttons" style="display: flex; gap: 10px; flex-direction: row; margin-top: 10px;">
+                <button class="login-submit-btn" id="auth-action-btn" onclick="submitAuth()" style="flex: 1; background: #2ed573; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">লগইন করুন</button>
+                <button class="login-cancel-btn" onclick="toggleAuthModal()" style="flex: 1; background: #ff4757; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">❌ বন্ধ করুন</button>
             </div>
 
             <p style="margin-top: 20px; text-align: center; font-size: 15px;">
@@ -181,11 +188,14 @@
 
     <!-- Data Category Modal Container -->
     <div id="data-modal" class="modal-overlay hidden">
-        <!-- আপনার আগের কোডের মতোই থাকবে -->
         <div class="modal-content">
             <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff9f43; padding: 15px; background: #151525;">
                 <h3 id="modal-title" style="margin: 0; color: #fff;">বিবরণ</h3>
-                <button onclick="closeCategoryModal()" style="background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;">❌ বন্ধ করুন</button>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <input type="text" id="search-modal" onkeyup="searchTable('search-modal', 'modal-table-body')" placeholder="🔍 নাম খুঁজুন..." style="padding: 6px 10px; border-radius: 5px; border: 1px solid #ccc; color: black; width: 150px;">
+                    <button onclick="printSection(document.getElementById('modal-title').innerText, 'modal-table-container')" style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;">🖨️ PDF</button>
+                    <button onclick="closeCategoryModal()" style="background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;">❌ বন্ধ করুন</button>
+                </div>
             </div>
             <div class="modal-body" style="padding-top: 15px;">
                 <div class="admin-only hidden data-entry-box">
@@ -208,12 +218,30 @@
         </div>
     </div>
 
-    <!-- Club Profile Edit Modal (আগের মতোই থাকবে) -->
+    <!-- Club Profile Edit Modal -->
     <div id="club-edit-modal" class="modal-overlay hidden">
-        <!-- আগের কোড অপরিবর্তিত থাকবে -->
+        <div class="auth-modal-content" style="width: 90%; max-width: 450px; text-align: left;">
+            <h3 style="text-align: center; border-bottom: 1px solid #3d3d5c; padding-bottom: 10px;">⚙️ ক্লাব প্রোফাইল এডিট</h3>
+            <div style="margin-top: 15px;">
+                <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">🪔 ক্লাবের নাম:</label>
+                <input type="text" id="edit-club-name" placeholder="যেমন: আমাদের গ্রাম্য পুজো কমিটি" style="margin-top: 5px; margin-bottom: 12px; text-align: left; letter-spacing: normal;">
+                <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">📍 ঠিকানা:</label>
+                <input type="text" id="edit-club-address" placeholder="যেমন: বাগনান, উলুবেড়িয়া, হাওড়া" style="margin-top: 5px; margin-bottom: 12px; text-align: left; letter-spacing: normal;">
+                <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">📞 মোবাইল নম্বর:</label>
+                <input type="text" id="edit-club-mobile" placeholder="যেমন: 9876543210" style="margin-top: 5px; margin-bottom: 12px; text-align: left; letter-spacing: normal;">
+                <label style="color: #ff9f43; font-size: 14px; font-weight: bold;">👥 কমিটি / সদস্য:</label>
+                <input type="text" id="edit-club-members" placeholder="যেমন: সভাপতি: রাহুল" style="margin-top: 5px; margin-bottom: 15px; text-align: left; letter-spacing: normal;">
+                <label style="color: #2ed573; font-size: 14px; font-weight: bold;">📅 এই সালের পুজোর তারিখ:</label>
+                <input type="text" id="edit-club-date" placeholder="যেমন: ২০ - ২৪ অক্টোবর" style="margin-top: 5px; margin-bottom: 12px; border: 1px solid #2ed573; text-align: left; letter-spacing: normal;">
+            </div>
+            <div class="auth-buttons" style="display: flex; gap: 10px;">
+                <button class="login-submit-btn" onclick="saveClubDetails()" style="width: 50%; background: #2ed573; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">💾 সেভ করুন</button>
+                <button class="login-cancel-btn" onclick="closeClubEditModal()" style="width: 50%; background: #ff4757; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">❌ বন্ধ করুন</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Full Screen Image Viewer Modal (আগের মতোই থাকবে) -->
+    <!-- Full Screen Image Viewer Modal -->
     <div id="image-viewer-modal" class="image-viewer-overlay hidden">
         <span class="image-close-btn" onclick="closeImageViewer()">&times;</span>
         <img id="full-size-image" class="image-viewer-content" src="">
@@ -222,7 +250,6 @@
     <!-- Firebase Connection -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        // এখানে createUserWithEmailAndPassword নতুন করে অ্যাড করা হলো
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -240,7 +267,7 @@
         window.database = getDatabase(app);
         
         window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword; // Sign up function
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
         window.signOut = signOut;
         window.onAuthStateChanged = onAuthStateChanged;
         window.dbRef = ref;
