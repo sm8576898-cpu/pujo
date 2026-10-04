@@ -2,8 +2,8 @@ let isAdmin = false;
 let currentYear = new Date().getFullYear().toString(); 
 let currentCategory = ''; 
 let availableYears = []; 
-let activeMainCategory = ''; // কোন পুজো সিলেক্ট করা হয়েছে তার জন্য
-let isLoginMode = true; // লগইন নাকি সাইন-আপ মোড তার জন্য
+let activeMainCategory = ''; 
+let isLoginMode = true; 
 
 const pujaNames = {
     'Ganga_Puja': '🌊 গঙ্গা পুজো',
@@ -13,45 +13,67 @@ const pujaNames = {
 };
 
 // =========================================
-// ১. ইনিশিয়ালাইজেশন এবং লগইন চেক (নতুন মাল্টি-লেয়ার)
+// ১. ইনিশিয়ালাইজেশন এবং লগইন চেক (পাবলিক ভিউ)
 // =========================================
 window.onload = () => {
     setTimeout(() => {
+        // অ্যাপ খুললেই প্রথমে পুজো সিলেক্ট করার পেজ দেখাবে (লগইন ছাড়াই)
+        document.getElementById('auth-modal').classList.add('hidden');
+        if (!activeMainCategory) {
+            document.getElementById('category-selection-screen').classList.remove('hidden');
+            document.getElementById('main-app-wrapper').classList.add('hidden');
+        }
+
         if (window.onAuthStateChanged) {
             window.onAuthStateChanged(window.auth, (user) => {
                 if (user) {
-                    isAdmin = true;
-                    // লগইন থাকলে মডাল লুকান এবং পুজো সিলেক্ট স্ক্রিন দেখান (যদি পুজো সিলেক্ট না থাকে)
-                    document.getElementById('auth-modal').classList.add('hidden');
-                    if (!activeMainCategory) {
-                        document.getElementById('category-selection-screen').classList.remove('hidden');
-                        document.getElementById('main-app-wrapper').classList.add('hidden');
+                    isAdmin = true; // অ্যাডমিন লগইন আছে
+                    document.getElementById('admin-login-btn').classList.add('hidden');
+                    document.getElementById('admin-logout-btn').classList.remove('hidden');
+                    
+                    let catAdminBtn = document.getElementById('cat-screen-admin-btn');
+                    if(catAdminBtn) {
+                        catAdminBtn.innerText = '🔓 লগআউট করুন';
+                        catAdminBtn.style.background = '#ff4757';
+                        catAdminBtn.onclick = logoutUser;
+                    }
+                    
+                    if (activeMainCategory) {
+                        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
                     }
                 } else {
-                    isAdmin = false;
-                    activeMainCategory = '';
-                    // লগআউট থাকলে শুধু লগইন/সাইন-আপ মডাল দেখান
-                    document.getElementById('auth-modal').classList.remove('hidden');
-                    document.getElementById('category-selection-screen').classList.add('hidden');
-                    document.getElementById('main-app-wrapper').classList.add('hidden');
+                    isAdmin = false; // সাধারণ ইউজার (লগইন নেই)
+                    document.getElementById('admin-login-btn').classList.remove('hidden');
+                    document.getElementById('admin-logout-btn').classList.add('hidden');
+                    
+                    let catAdminBtn = document.getElementById('cat-screen-admin-btn');
+                    if(catAdminBtn) {
+                        catAdminBtn.innerText = '🔒 অ্যাডমিন লগইন';
+                        catAdminBtn.style.background = '#3498db';
+                        catAdminBtn.onclick = toggleAuthModal;
+                    }
+
+                    document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
                 }
             });
         }
-    }, 1000);
+    }, 500);
 };
 
 // =========================================
-// ২. সাইন-আপ এবং লগইন কন্ট্রোল (নতুন)
+// ২. সাইন-আপ এবং লগইন কন্ট্রোল
 // =========================================
+window.toggleAuthModal = function() {
+    document.getElementById('auth-modal').classList.toggle('hidden');
+}
+
 window.togglePasswordVisibility = function() {
     const passInput = document.getElementById('auth-password');
     const eyeSpan = document.getElementById('toggle-password-eye');
     if (passInput.type === 'password') {
-        passInput.type = 'text';
-        eyeSpan.innerText = '🙈';
+        passInput.type = 'text'; eyeSpan.innerText = '🙈';
     } else {
-        passInput.type = 'password';
-        eyeSpan.innerText = '👁️';
+        passInput.type = 'password'; eyeSpan.innerText = '👁️';
     }
 }
 
@@ -73,7 +95,6 @@ window.toggleAuthMode = function() {
 window.submitAuth = function() {
     const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
-    
     if(!email || !password) { alert("ইমেইল এবং পাসওয়ার্ড দিতেই হবে!"); return; }
     
     if(isLoginMode) {
@@ -81,27 +102,30 @@ window.submitAuth = function() {
         .then(() => {
             document.getElementById('auth-email').value = '';
             document.getElementById('auth-password').value = '';
-        })
-        .catch((error) => { alert("ভুল ইমেইল বা পাসওয়ার্ড! আবার চেষ্টা করুন।"); });
+            document.getElementById('auth-modal').classList.add('hidden');
+        }).catch((error) => { alert("ভুল ইমেইল বা পাসওয়ার্ড! আবার চেষ্টা করুন।"); });
     } else {
         window.createUserWithEmailAndPassword(window.auth, email, password)
         .then(() => {
             alert("নতুন অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!");
             document.getElementById('auth-email').value = '';
             document.getElementById('auth-password').value = '';
-        })
-        .catch((error) => { alert("অ্যাকাউন্ট তৈরি করা যায়নি: " + error.message); });
+            document.getElementById('auth-modal').classList.add('hidden');
+        }).catch((error) => { alert("অ্যাকাউন্ট তৈরি করা যায়নি: " + error.message); });
     }
 }
 
 window.logoutUser = function() {
     if(confirm("আপনি কি লগআউট করতে চান?")) {
-        window.signOut(window.auth).then(() => alert("লগআউট সফল হয়েছে!"));
+        window.signOut(window.auth).then(() => {
+            alert("লগআউট সফল হয়েছে!");
+            window.location.reload();
+        });
     }
 }
 
 // =========================================
-// ৩. পুজো ক্যাটাগরি কন্ট্রোল (নতুন)
+// ৩. পুজো ক্যাটাগরি কন্ট্রোল (পাবলিক ভিউ)
 // =========================================
 window.selectMainCategory = function(cat) {
     activeMainCategory = cat;
@@ -110,9 +134,12 @@ window.selectMainCategory = function(cat) {
     document.getElementById('current-active-puja').innerText = pujaNames[cat];
     
     let adminElements = document.querySelectorAll('.admin-only');
-    adminElements.forEach(el => el.classList.remove('hidden'));
+    if (isAdmin) {
+        adminElements.forEach(el => el.classList.remove('hidden'));
+    } else {
+        adminElements.forEach(el => el.classList.add('hidden'));
+    }
     
-    // নির্দিষ্ট পুজোর ডেটা লোড করা শুরু
     loadYearsFromDatabase();
     loadClubDetails();
     setupViewCounter();
@@ -151,7 +178,7 @@ function getFormattedDate(inputDate) {
 }
 
 // =========================================
-// ৫. বছর বা সাল কন্ট্রোল (ডায়নামিক পাথ)
+// ৫. বছর বা সাল কন্ট্রোল
 // =========================================
 function loadYearsFromDatabase() {
     const yearsRef = window.dbRef(window.database, `data/${activeMainCategory}/system/years`);
@@ -172,8 +199,7 @@ function renderYearSelector() {
     yearSelect.innerHTML = '';
     availableYears.sort((a, b) => b - a).forEach(year => {
         let opt = document.createElement('option');
-        opt.value = year;
-        opt.innerText = year;
+        opt.value = year; opt.innerText = year;
         if (year === currentYear) opt.selected = true;
         yearSelect.appendChild(opt);
     });
@@ -185,63 +211,31 @@ window.openAddYearPrompt = function() {
         if (!availableYears.includes(newYear)) {
             availableYears.push(newYear);
             window.dbSet(window.dbRef(window.database, `data/${activeMainCategory}/system/years`), availableYears).then(() => {
-                currentYear = newYear; 
-                renderYearSelector();
-                loadAllData(); 
-                alert(newYear + " সাল সফলভাবে যোগ করা হয়েছে!");
+                currentYear = newYear; renderYearSelector(); loadAllData(); alert(newYear + " সাল যোগ করা হয়েছে!");
             });
         } else {
-            alert("এই সালটি আগে থেকেই ড্রপডাউনে আছে!");
-            currentYear = newYear;
-            renderYearSelector();
-            loadAllData();
+            alert("এই সালটি আগে থেকেই আছে!"); currentYear = newYear; renderYearSelector(); loadAllData();
         }
-    } else if (newYear !== null) {
-        alert("দয়া করে সঠিক ৪ সংখ্যার সাল লিখুন!");
     }
 }
 
 window.deleteYearPrompt = function() {
     const yearToDelete = prompt("আপনি কোন সালটি ডিলিট করতে চান? (যেমন: 2024):");
     if (!yearToDelete) return;
-
     const yearStr = yearToDelete.trim();
-    if (!availableYears.includes(yearStr)) { alert("এই সালটি ড্রপডাউন লিস্টে খুঁজে পাওয়া যায়নি!"); return; }
+    if (!availableYears.includes(yearStr)) { alert("এই সালটি খুঁজে পাওয়া যায়নি!"); return; }
     if (availableYears.length === 1) { alert("কমপক্ষে একটি সাল সিস্টেমে রাখতেই হবে!"); return; }
-
-    const fundRef = window.dbRef(window.database, `data/${activeMainCategory}/funds/${yearStr}`);
-    const noticeRef = window.dbRef(window.database, `data/${activeMainCategory}/notices/${yearStr}`);
-    const galleryRef = window.dbRef(window.database, `data/${activeMainCategory}/gallery/${yearStr}`);
-
-    window.dbOnValue(fundRef, (fundSnap) => {
-        window.dbOnValue(noticeRef, (noticeSnap) => {
-            window.dbOnValue(galleryRef, (gallerySnap) => {
-                const hasAnyData = fundSnap.exists() || noticeSnap.exists() || gallerySnap.exists();
-                if (hasAnyData) {
-                    if (confirm(`⚠️ সাবধান! ${yearStr} সালে ডেটা আছে! সত্যিই মুছে ফেলতে চান?`)) {
-                        if (confirm(`🚨 শেষ সতর্কবার্তা! আপনি কি ১০০% নিশ্চিত?`)) performDeleteYear(yearStr);
-                    }
-                } else {
-                    if (confirm(`${yearStr} সালটি ফাঁকা। আপনি কি এটি মুছে ফেলতে চান?`)) performDeleteYear(yearStr);
-                }
-            }, { onlyOnce: true });
-        }, { onlyOnce: true });
-    }, { onlyOnce: true });
-}
-
-function performDeleteYear(yearStr) {
-    availableYears = availableYears.filter(y => y !== yearStr);
-    window.dbSet(window.dbRef(window.database, `data/${activeMainCategory}/system/years`), availableYears).then(() => {
-        window.dbRemove(window.dbRef(window.database, `data/${activeMainCategory}/funds/${yearStr}`));
-        window.dbRemove(window.dbRef(window.database, `data/${activeMainCategory}/notices/${yearStr}`));
-        window.dbRemove(window.dbRef(window.database, `data/${activeMainCategory}/gallery/${yearStr}`));
-        window.dbRemove(window.dbRef(window.database, `data/${activeMainCategory}/system/pujaDates/${yearStr}`)); 
-
-        if (currentYear === yearStr) currentYear = availableYears[0];
-        renderYearSelector();
-        loadAllData();
-        alert(`${yearStr} সাল সফলভাবে ডিলিট করা হয়েছে!`);
-    });
+    
+    if (confirm(`🚨 শেষ সতর্কবার্তা! আপনি কি সত্যিই ${yearStr} সাল মুছে ফেলতে চান?`)) {
+        availableYears = availableYears.filter(y => y !== yearStr);
+        window.dbSet(window.dbRef(window.database, `data/${activeMainCategory}/system/years`), availableYears).then(() => {
+            window.dbRemove(window.dbRef(window.database, `data/${activeMainCategory}/funds/${yearStr}`));
+            window.dbRemove(window.dbRef(window.database, `data/${activeMainCategory}/notices/${yearStr}`));
+            window.dbRemove(window.dbRef(window.database, `data/${activeMainCategory}/gallery/${yearStr}`));
+            if (currentYear === yearStr) currentYear = availableYears[0];
+            renderYearSelector(); loadAllData(); alert(`${yearStr} সাল ডিলিট করা হয়েছে!`);
+        });
+    }
 }
 
 window.handleYearChange = function() {
@@ -250,7 +244,7 @@ window.handleYearChange = function() {
 }
 
 // =========================================
-// ৬. ক্লাব প্রোফাইল এবং তারিখ (ডায়নামিক পাথ)
+// ৬. ক্লাব প্রোফাইল এবং তারিখ
 // =========================================
 function loadClubDetails() {
     const clubRef = window.dbRef(window.database, `data/${activeMainCategory}/system/clubDetails`);
@@ -262,7 +256,6 @@ function loadClubDetails() {
             document.getElementById('display-club-mobile').innerText = "📞 মোবাইল: " + (data.mobile || "যোগাযোগ নম্বর দেওয়া নেই");
             document.getElementById('display-club-members').innerText = "👥 কমিটি / মূল সদস্য: " + (data.members || "অ্যাডমিন প্যানেল থেকে নাম যোগ করুন");
         } else {
-            // ডিফল্ট ভ্যালু যদি ডেটা না থাকে
             document.getElementById('display-club-name').innerText = "🪔 আমাদের গ্রাম্য পুজো কমিটি";
             document.getElementById('display-club-address').innerText = "📍 গ্রাম + পোস্ট: বাগনান, উলুবেড়িয়া, হাওড়া";
             document.getElementById('display-club-mobile').innerText = "📞 মোবাইল: যোগাযোগ নম্বর দেওয়া নেই";
@@ -306,10 +299,7 @@ window.saveClubDetails = function() {
     if (!name) { alert("ক্লাবের নাম ফাঁকা রাখা যাবে না!"); return; }
 
     window.dbSet(window.dbRef(window.database, `data/${activeMainCategory}/system/clubDetails`), {
-        name: name,
-        address: address,
-        mobile: mobile,
-        members: members
+        name: name, address: address, mobile: mobile, members: members
     }).then(() => {
         window.dbSet(window.dbRef(window.database, `data/${activeMainCategory}/system/pujaDates/${currentYear}`), pujaDate).then(() => {
             alert("ক্লাবের বিবরণ আপডেট হয়েছে!");
@@ -319,7 +309,7 @@ window.saveClubDetails = function() {
 }
 
 // =========================================
-// ৭. সমস্ত ডেটা ফেচ করা
+// ৭. ডেটা লোড করা
 // =========================================
 function loadAllData() {
     loadPujaDate(); 
@@ -345,14 +335,7 @@ function loadNotices() {
                         <button class="edit-entry-btn" data-text="${safeText}" onclick="editNotice('${key}', this.getAttribute('data-text'))">এডিট</button>
                         <button class="delete-entry-btn" onclick="deleteData('notices/${currentYear}/${key}')">ডিলিট</button>
                     </div>` : '';
-                
-                noticeList.innerHTML += `
-                    <div class="notice-item">
-                        <span class="notice-date">${formatDateForDisplay(notice.date)}</span>
-                        ${notice.text}
-                        ${actionHtml}
-                    </div>
-                `;
+                noticeList.innerHTML += `<div class="notice-item"><span class="notice-date">${formatDateForDisplay(notice.date)}</span>${notice.text}${actionHtml}</div>`;
             });
         } else {
             noticeList.innerHTML = '<p style="color:#a0a0b5; font-size:14px;">এই সালের কোনো নোটিশ নেই।</p>';
@@ -371,9 +354,7 @@ function loadFinancialData() {
             ['mukto_haste', 'guest_card', 'matha_pichu', 'adhai'].forEach(cat => {
                 if (data[cat]) {
                     Object.values(data[cat]).forEach(item => {
-                        let amount = Number(item.amount || 0);
-                        totalIncome += amount;
-                        categoryTotals[cat] += amount;
+                        let amount = Number(item.amount || 0); totalIncome += amount; categoryTotals[cat] += amount;
                     });
                 }
             });
@@ -407,14 +388,7 @@ function loadExpenses() {
                         <button class="delete-entry-btn" onclick="deleteData('funds/${currentYear}/expenses/${key}')">ডিলিট</button>
                     </td>` : '<td class="admin-only hidden no-print"></td>';
                 
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${formatDateForDisplay(item.date)}</td>
-                        <td>${item.purpose}</td>
-                        <td style="color:#ff4757; font-weight:bold;">₹${item.amount}</td>
-                        ${actionHtml}
-                    </tr>
-                `;
+                tbody.innerHTML += `<tr><td>${formatDateForDisplay(item.date)}</td><td>${item.purpose}</td><td style="color:#ff4757; font-weight:bold;">₹${item.amount}</td>${actionHtml}</tr>`;
             });
         } else {
             tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">কোনো খরচের হিসাব নেই</td></tr>`;
@@ -428,13 +402,10 @@ function loadExpenses() {
 window.uploadToGallery = function() {
     const fileInput = document.getElementById('gallery-file-input');
     const titleInput = document.getElementById('gallery-title').value.trim();
-    
     if (!fileInput.files || fileInput.files.length === 0) { alert("ফাইল সিলেক্ট করুন!"); return; }
     if (!titleInput) { alert("ডকুমেন্টের নাম দিন!"); return; }
-    
     const file = fileInput.files[0];
     if (file.size > 1024 * 1024) { alert("⚠️ ফাইল সাইজ 1MB-র চেয়ে বড়!"); fileInput.value = ''; return; }
-    
     const dateStr = getFormattedDate(); 
 
     if (file.type === "application/pdf") {
@@ -464,9 +435,7 @@ function saveToFirebaseGallery(title, dataUrl, type, dateStr, fileInput) {
     window.dbPush(window.dbRef(window.database, `data/${activeMainCategory}/gallery/${currentYear}`), {
         title: title, url: dataUrl, type: type, date: dateStr
     }).then(() => {
-        alert("আপলোড সফল হয়েছে!");
-        fileInput.value = '';
-        document.getElementById('gallery-title').value = '';
+        alert("আপলোড সফল হয়েছে!"); fileInput.value = ''; document.getElementById('gallery-title').value = '';
     });
 }
 
@@ -606,7 +575,7 @@ window.deleteData = function(subPath) {
 }
 
 // =========================================
-// ১৩. ভিউ কাউন্টার (নির্দিষ্ট পুজোর জন্য)
+// ১৩. ভিউ কাউন্টার
 // =========================================
 function setupViewCounter() {
     const viewsRef = window.dbRef(window.database, `data/${activeMainCategory}/system/viewCount`);
@@ -627,7 +596,7 @@ function setupViewCounter() {
 }
 
 // =========================================
-// ১৪. লাইভ সার্চ এবং শেয়ার
+// ১৪. লাইভ সার্চ এবং পিডিএফ
 // =========================================
 window.searchTable = function(inputId, tbodyId) {
     let input = document.getElementById(inputId).value.toLowerCase();
